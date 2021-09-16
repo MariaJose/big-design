@@ -12,6 +12,7 @@ export * from './Dropdown';
 export * from './Flex';
 export * from './Fieldset';
 export * from './Form';
+export * from './GucciBox';
 export * from './GlobalStyles';
 export * from './Grid';
 export * from './InlineMessage';
