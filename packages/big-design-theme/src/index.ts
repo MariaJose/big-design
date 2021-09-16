@@ -1,3 +1,5 @@
+import { createStitches, defaultThemeMap } from '@stitches/react';
+
 import { createHelpers, Helpers } from './helpers';
 import { ThemeOptions, themeOptions } from './options';
 import { Border, BorderRadius, createBorder, createBorderRadius } from './system/border';
@@ -52,3 +54,33 @@ export const theme: ThemeInterface = createTheme();
 declare module 'styled-components' {
   export interface DefaultTheme extends ThemeInterface {} // eslint-disable-line
 }
+
+export const bdStitches = createStitches({
+  theme: {
+    colors: { ...colors },
+    space: { ...createSpacing() },
+    sizes: { ...createSpacing() },
+    radii: { ...createBorderRadius() },
+    lineHeights: { ...createLineHeight() },
+    fonts: {
+      sans: createTypography().fontFamily,
+    },
+    fontSizes: { ...createTypography().fontSize },
+    fontWeights: { ...createTypography().fontWeight },
+    zIndices: { ...zIndex },
+    shadows: {
+      floating: `0px 2px 12px ${createHelpers().createRGBA(colors.secondary70, 0.2)}`,
+      raised: `0px 1px 6px ${createHelpers().createRGBA(colors.secondary70, 0.2)}`,
+    },
+    border: {
+      box: '1px solid $colors$secondary30',
+      boxError: '1px solid $colors$danger40',
+    },
+  },
+  themeMap: {
+    ...defaultThemeMap,
+    border: 'border',
+  },
+});
+
+export const { styled } = bdStitches;
