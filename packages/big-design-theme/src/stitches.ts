@@ -35,4 +35,9 @@ export const { styled, config, createTheme, css, getCssText, globalCss, keyframe
       ...defaultThemeMap,
       border: 'border',
     },
+    media: {
+      mobile: '(min-width: 0px)',
+      tablet: '(min-width: 720px)',
+      desktop: '(min-width: 1025px)',
+    },
   });
