@@ -10,7 +10,7 @@
     "ci": "lerna run ci --stream",
     "diff": "lerna diff",
     "lint": "eslint . --ext .ts,.tsx,.js",
-    "start": "lerna run start --stream --parallel --ignore @bigcommerce/examples",
+    "start": "yarn workspace @bigcommerce/docs start",
     "test": "lerna run test --stream"
   },
   "husky": {
