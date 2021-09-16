@@ -2,9 +2,8 @@
   "name": "@bigcommerce/big-design",
   "version": "0.30.2",
   "sideEffects": false,
-  "main": "dist/cjs/index.js",
-  "module": "dist/es/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
   "author": "BigCommerce Inc",
   "repository": {
     "type": "git",
