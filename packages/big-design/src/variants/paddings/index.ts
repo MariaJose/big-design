@@ -1,8 +1,8 @@
 import { css } from '@bigcommerce/big-design-theme/stitches';
 
-import { tokenVariants } from '../../../utils';
+import { tokenVariants } from '../../utils';
 
-export const cssPaddings = css({
+export const paddingVariants = css({
   variants: {
     padding: tokenVariants({ token: 'space', css: (value) => ({ padding: value }) }),
     paddingTop: tokenVariants({ token: 'space', css: (value) => ({ paddingTop: value }) }),

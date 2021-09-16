@@ -1,6 +1,6 @@
 import { css } from '@bigcommerce/big-design-theme/stitches';
 
-export const cssDisplay = css({
+export const displayVariants = css({
   variants: {
     display: {
       block: {

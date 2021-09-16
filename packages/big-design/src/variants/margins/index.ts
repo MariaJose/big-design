@@ -1,8 +1,8 @@
 import { css } from '@bigcommerce/big-design-theme/stitches';
 
-import { tokenVariants } from '../../../utils';
+import { tokenVariants } from '../../utils';
 
-export const cssMargins = css({
+export const marginVariants = css({
   variants: {
     margin: tokenVariants({ token: 'space', css: (value) => ({ margin: value }) }),
     marginTop: tokenVariants({ token: 'space', css: (value) => ({ marginTop: value }) }),
