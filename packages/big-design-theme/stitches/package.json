@@ -1,0 +1,6 @@
+{
+  "name": "@bigcommerce/big-design-theme/stitches",
+  "main": "../src/stitches.ts",
+  "module": "../src/stitches.ts",
+  "private": true
+}
