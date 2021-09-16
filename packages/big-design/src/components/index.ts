@@ -38,5 +38,5 @@ export * from './Tabs';
 export * from './Textarea';
 export * from './Timepicker';
 export * from './Tooltip';
-export * from './Typography';
+export * from './GucciTypography';
 export * from './Worksheet';
