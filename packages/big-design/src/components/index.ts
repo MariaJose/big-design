@@ -16,6 +16,7 @@ export * from './GlobalStyles';
 export * from './Grid';
 export * from './GucciBadge';
 export * from './GucciBox';
+export * from './GucciModal';
 export * from './InlineMessage';
 export * from './Input';
 export * from './Link';

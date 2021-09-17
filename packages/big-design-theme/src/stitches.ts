@@ -2,6 +2,7 @@ import { createStitches, defaultThemeMap } from '@stitches/react';
 
 import { createHelpers } from './helpers';
 import { createBorderRadius } from './system/border';
+import { breakpointValues } from './system/breakpoints';
 import { colors } from './system/colors';
 import { createLineHeight } from './system/line-height';
 import { createSpacing } from './system/spacing';
@@ -13,7 +14,7 @@ export const { styled, config, createTheme, css, getCssText, globalCss, keyframe
     theme: {
       colors: { ...colors },
       space: { ...createSpacing() },
-      sizes: { ...createSpacing() },
+      sizes: { ...createSpacing(), ...breakpointValues },
       radii: { ...createBorderRadius() },
       lineHeights: { ...createLineHeight() },
       fonts: {
