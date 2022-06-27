@@ -134,4 +134,10 @@ export const DragIconHeaderCell: React.FC<DragIconCellProps> = memo(
   },
 );
 
+export const ExpandableHeaderCell: React.FC<DragIconCellProps> = memo(({ actionsRef }) => {
+  const actionsSize = useComponentSize(actionsRef);
+
+  return <StyledTableHeaderIcon stickyHeight={actionsSize.height} />;
+});
+
 export const HeaderCell = typedMemo(InternalHeaderCell);
