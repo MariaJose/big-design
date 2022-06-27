@@ -3,14 +3,18 @@ import React from 'react';
 import { Checkbox } from '../../Checkbox';
 import { Flex, FlexItem } from '../../Flex';
 import { Text } from '../../Typography';
-import { TableItem, TablePaginationProps, TableSelectable } from '../types';
+import { TableItem, TablePaginationProps, TableProps, TableSelectable } from '../types';
+
+import { useSelectAllState } from './useSelectAllState';
 
 export interface SelectAllProps<T> {
   items: T[];
   totalItems: number;
-  onChange?: TableSelectable<T>['onSelectionChange'];
+  onChange?: TableSelectable['onSelectionChange'];
   pagination?: TablePaginationProps;
-  selectedItems: Set<T>;
+  selectedItems: TableSelectable['selectedItems'];
+  expandedRowSelector: TableProps<T>['expandedRowSelector'];
+  isExpandable: boolean;
 }
 
 export const SelectAll = <T extends TableItem>({
@@ -18,37 +22,11 @@ export const SelectAll = <T extends TableItem>({
   onChange,
   selectedItems,
   totalItems,
+  isExpandable,
+  expandedRowSelector,
 }: SelectAllProps<T>) => {
-  const allInPageSelected = items.length > 0 && items.every((item) => selectedItems.has(item));
-  const someInPageSelected = items.length > 0 && items.some((item) => selectedItems.has(item));
-
-  const handleSelectAll = () => {
-    if (typeof onChange !== 'function') {
-      return;
-    }
-
-    if (selectedItems.size === 0) {
-      return onChange([...items]);
-    }
-
-    if (allInPageSelected) {
-      const newSelectedItems = new Set(selectedItems);
-
-      items.forEach((item) => newSelectedItems.delete(item));
-
-      return onChange([...newSelectedItems]);
-    }
-
-    return onChange([...new Set([...selectedItems, ...items])]);
-  };
-
-  if (typeof onChange !== 'function') {
-    return null;
-  }
-
-  const totalSelectedItems = selectedItems.size;
-
-  const label = allInPageSelected ? 'Deselect All' : 'Select All';
+  const { allInPageSelected, handleSelectAll, label, someInPageSelected, totalSelectedItems } =
+    useSelectAllState(expandedRowSelector, isExpandable, items, selectedItems, onChange);
 
   return (
     <FlexItem flexShrink={0} marginRight="xxSmall">

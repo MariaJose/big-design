@@ -9,6 +9,7 @@ export interface DataCellProps
     TableColumnDisplayProps {
   align?: 'left' | 'center' | 'right';
   children?: React.ReactNode;
+  isExpandable?: boolean;
   isCheckbox?: boolean;
   verticalAlign?: 'top' | 'middle';
   width?: number | string;
@@ -22,6 +23,7 @@ export const DataCell: React.FC<DataCellProps> = memo(
     children,
     display,
     isCheckbox,
+    isExpandable = false,
     verticalAlign,
     width,
     withBorder = true,
@@ -31,6 +33,7 @@ export const DataCell: React.FC<DataCellProps> = memo(
       <StyledTableDataCheckbox
         align={align}
         display={display}
+        isExpandable={isExpandable}
         width={width}
         withBorder={withBorder}
       >

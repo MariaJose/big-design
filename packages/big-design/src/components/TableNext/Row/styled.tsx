@@ -20,4 +20,12 @@ export const StyledTableRow = styled.tr<StyledTableRowProps>`
   }
 `;
 
+export const StyledExpandedIcon = styled.button`
+  color: ${({ theme }) => theme.colors.secondary60};
+  background-color: transparent;
+  border-color: transparent;
+  padding: 0;
+`;
+
 StyledTableRow.defaultProps = { theme: defaultTheme };
+StyledExpandedIcon.defaultProps = { theme: defaultTheme };

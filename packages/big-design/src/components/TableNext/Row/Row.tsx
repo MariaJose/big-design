@@ -1,60 +1,165 @@
-import { DragIndicatorIcon } from '@bigcommerce/big-design-icons';
-import React, { forwardRef, TableHTMLAttributes } from 'react';
+import { ChevronRightIcon, DragIndicatorIcon, ExpandMoreIcon } from '@bigcommerce/big-design-icons';
+import React, { forwardRef, ReactNode, TableHTMLAttributes } from 'react';
 
 import { typedMemo } from '../../../utils';
+import { Box } from '../../Box';
 import { Checkbox } from '../../Checkbox';
 import { DataCell } from '../DataCell';
-import { TableColumn, TableItem } from '../types';
+import { TableColumn, TableItem, TableSelectable } from '../types';
 
-import { StyledTableRow } from './styled';
-
-export interface RowProps<T> extends TableHTMLAttributes<HTMLTableRowElement> {
-  columns: Array<TableColumn<T>>;
-  headerCellWidths: Array<number | string>;
-  item: T;
-  isDragging?: boolean;
-  isSelected?: boolean;
-  isSelectable?: boolean;
-  showDragIcon?: boolean;
-  onItemSelect?(item: T): void;
-}
+import { StyledExpandedIcon, StyledTableRow } from './styled';
+import { useRowState } from './useRowState';
 
 interface PrivateProps {
   forwardedRef?: React.Ref<HTMLTableRowElement>;
 }
 
+export interface RowProps<T> extends TableHTMLAttributes<HTMLTableRowElement> {
+  childrenRows: T[];
+  childRowIndex?: number;
+  columns: Array<TableColumn<T>>;
+  headerCellWidths: Array<number | string>;
+  isDraggable: boolean;
+  isDragging?: boolean;
+  isExpanded?: boolean;
+  isExpandable?: boolean;
+  isParentRow?: boolean;
+  isSelected?: boolean;
+  isSelectable?: boolean;
+  item: T;
+  parentRowIndex: number;
+  selectedItems: TableSelectable['selectedItems'];
+  showDragIcon?: boolean;
+  onExpandedRow?(parentRowIndex: number | null): void;
+  onItemSelect?(
+    childRowIndex: number | null,
+    index: number,
+    childrenRows: T[],
+    isParentRow: boolean,
+    isExpandable: boolean,
+  ): void;
+}
+
 const InternalRow = <T extends TableItem>({
+  childrenRows,
+  childRowIndex,
   columns,
   forwardedRef,
   headerCellWidths,
+  isDraggable,
   isDragging = false,
+  isExpandable = false,
   isSelectable = false,
   isSelected = false,
   item,
+  parentRowIndex,
   showDragIcon = false,
   onItemSelect,
+  onExpandedRow,
+  isExpanded = false,
+  selectedItems,
+  isParentRow = false,
   ...rest
 }: RowProps<T> & PrivateProps) => {
-  const onChange = () => {
-    if (onItemSelect) {
-      onItemSelect(item);
+  const { hasChildrenRows, label, onChange, onExpandedChange, isChecked, isIndeterminate } =
+    useRowState({
+      childRowIndex,
+      childrenRows,
+      isExpandable,
+      isParentRow,
+      isSelected,
+      onExpandedRow,
+      onItemSelect,
+      selectedItems,
+      parentRowIndex,
+    });
+
+  const renderSelectDataCell = () => {
+    if (isSelectable && isParentRow) {
+      return (
+        <DataCell
+          cellPadding={0}
+          isCheckbox={true}
+          isExpandable={isExpandable}
+          key="data-checkbox"
+          width={10}
+          withPadding={false}
+        >
+          <Checkbox
+            checked={isChecked}
+            hiddenLabel
+            isIndeterminate={isIndeterminate}
+            label={label}
+            onChange={onChange}
+            width={0}
+          />
+        </DataCell>
+      );
     }
+
+    return null;
   };
 
-  const label = isSelected ? `Selected` : `Unselected`;
-
-  return (
-    <StyledTableRow isDragging={isDragging} isSelected={isSelected} ref={forwardedRef} {...rest}>
-      {showDragIcon && (
+  const renderDragIconCell = () => {
+    if (showDragIcon && isParentRow) {
+      return (
         <DataCell width={headerCellWidths[0]}>
           <DragIndicatorIcon />
         </DataCell>
-      )}
-      {isSelectable && (
-        <DataCell isCheckbox={true} key="data-checkbox">
-          <Checkbox checked={isSelected} hiddenLabel label={label} onChange={onChange} />
+      );
+    }
+
+    return null;
+  };
+
+  const renderExpandedIconCell = () => {
+    if (isExpandable && isParentRow && hasChildrenRows) {
+      return (
+        <DataCell
+          cellPadding={isSelectable || isDraggable ? 0 : undefined}
+          withPadding={isSelectable || isDraggable ? false : undefined}
+        >
+          <StyledExpandedIcon onClick={onExpandedChange}>
+            {isExpanded ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+          </StyledExpandedIcon>
         </DataCell>
-      )}
+      );
+    }
+
+    return null;
+  };
+
+  const renderExtraCellsForParentRow = () => {
+    const extraDataCells: ReactNode[] = [];
+
+    if (!hasChildrenRows) {
+      extraDataCells.push(<DataCell key={`parent-extra-cell-${parentRowIndex}-1`} />);
+    }
+
+    return extraDataCells;
+  };
+
+  const renderExtraCellsForChildRow = () => {
+    const extraDataCells: ReactNode[] = [<DataCell key={`child-extra-cell-${childRowIndex}-0`} />];
+
+    if (isDraggable) {
+      extraDataCells.push(<DataCell key={`child-extra-cell-${childRowIndex}-1`} />);
+    }
+
+    if (isSelectable) {
+      extraDataCells.push(<DataCell key={`child-extra-cell-${childRowIndex}-2`} />);
+    }
+
+    return extraDataCells;
+  };
+
+  return (
+    <StyledTableRow isDragging={isDragging} isSelected={isSelected} ref={forwardedRef} {...rest}>
+      {renderDragIconCell()}
+      {isParentRow && renderSelectDataCell()}
+      {renderExpandedIconCell()}
+      {isParentRow && isExpandable && renderExtraCellsForParentRow()}
+      {isExpandable && !isParentRow && renderExtraCellsForChildRow()}
 
       {columns.map(
         (
@@ -72,9 +177,20 @@ const InternalRow = <T extends TableItem>({
               width={isDragging ? cellWidth : width}
               withPadding={withPadding}
             >
-              {/*
+              <Box display="flex">
+                {columnIndex === 0 && isExpandable && isSelectable && !isParentRow && (
+                  <Checkbox
+                    checked={isSelected}
+                    hiddenLabel
+                    label={label}
+                    onChange={onChange}
+                    width={0}
+                  />
+                )}
+                {/*
           // @ts-expect-error https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20544 */}
-              <CellContent {...item} />
+                <CellContent {...item} />
+              </Box>
             </DataCell>
           );
         },

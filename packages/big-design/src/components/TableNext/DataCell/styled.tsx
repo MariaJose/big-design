@@ -57,9 +57,11 @@ export const StyledTableDataCheckbox = styled(StyledTableDataCell)`
     padding-left: ${({ theme }) => theme.spacing.xLarge};
   }
 
-  &:last-of-type {
-    padding-right: ${({ theme }) => theme.spacing.xLarge};
-  }
+  ${({ isExpandable }) =>
+    isExpandable &&
+    css`
+      padding-right: 0;
+    `}
 
   ${(props) =>
     props.isCheckbox &&
