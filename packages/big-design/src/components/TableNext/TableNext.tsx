@@ -187,6 +187,7 @@ const InternalTableNext = <T extends TableItem>(
                     onItemSelect={onItemSelect}
                     parentRowIndex={index}
                     ref={provided.innerRef}
+                    renderHelperRow={expandable?.render}
                     selectedItems={selectedItems}
                     showDragIcon={true}
                   />
@@ -223,6 +224,7 @@ const InternalTableNext = <T extends TableItem>(
               onExpandedRow={onExpandedRow}
               onItemSelect={onItemSelect}
               parentRowIndex={index}
+              renderHelperRow={expandable?.render}
               selectedItems={selectedItems}
             />
           );

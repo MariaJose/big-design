@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import React, { ComponentType, ReactNode, TableHTMLAttributes } from 'react';
 
 import { MarginProps } from '../../mixins';
 import { PaginationProps } from '../Pagination';
@@ -14,6 +14,9 @@ export interface TableExpandable<T> {
   expandedRows: Record<string, true>;
   onExpandedChange(expandedItems: Record<string, true>): void;
   expandedRowSelector: (item: T) => T[] | undefined;
+  render?:
+    | ComponentType<{ parentRowIndex: number; children?: ReactNode }>
+    | ((props: { parentRowIndex: number; children?: ReactNode }, context?: any) => ReactNode);
 }
 
 export type TableSortDirection = 'ASC' | 'DESC';
@@ -46,7 +49,7 @@ export interface TableColumn<T> extends TableColumnDisplayProps {
 
 export type TablePaginationProps = Omit<PaginationProps, keyof MarginProps>;
 
-export interface TableProps<T> extends React.TableHTMLAttributes<HTMLTableElement> {
+export interface TableProps<T> extends TableHTMLAttributes<HTMLTableElement> {
   actions?: React.ReactNode;
   columns: Array<TableColumn<T>>;
   emptyComponent?: React.ReactElement;
