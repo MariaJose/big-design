@@ -107,7 +107,6 @@ const InternalRow = <T extends TableItem>({
   };
 
   const renderExpandedIconCell = () => {
-    // TODO: Check this
     if (isExpandable && isParentRow && hasChildrenRows) {
       const needsHorizontalPadding = !isSelectable && !isDraggable;
 
