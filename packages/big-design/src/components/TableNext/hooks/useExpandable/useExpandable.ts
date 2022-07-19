@@ -20,11 +20,11 @@ export const useExpandable = <T>(expandable?: TableExpandable<T>) => {
     if (isExpandedRow) {
       delete newExpandedRows[parentRowIndex];
 
-      onExpandedChange(newExpandedRows);
+      onExpandedChange(newExpandedRows, parentRowIndex);
     } else {
       newExpandedRows[parentRowIndex] = true;
 
-      onExpandedChange(newExpandedRows);
+      onExpandedChange(newExpandedRows, parentRowIndex);
     }
   });
 

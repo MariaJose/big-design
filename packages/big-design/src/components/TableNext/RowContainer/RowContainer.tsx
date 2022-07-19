@@ -1,7 +1,6 @@
 import React, { forwardRef } from 'react';
 
 import { typedMemo } from '../../../utils';
-import { Box } from '../../Box';
 import { DataCell } from '../DataCell';
 import { Row, RowProps } from '../Row';
 import { TableExpandable, TableItem } from '../types';
@@ -12,7 +11,7 @@ interface InternalRowContainerProps<T>
   expandedRowSelector?: TableExpandable<T>['expandedRowSelector'];
   getItemKey: (item: T, index: number) => string | number;
   headerless?: boolean;
-  renderHelperRow?: TableExpandable<T>['render'];
+  renderHelperRow?: TableExpandable<T>['renderHelperRow'];
 }
 
 interface PrivateProps {
@@ -47,7 +46,7 @@ const InternalRowContainer = <T extends TableItem>({
   return (
     <>
       <Row
-        childrenRows={childrenRows ?? []}
+        childrenRows={childrenRows}
         columns={columns}
         headerCellWidths={headerCellWidths}
         isDraggable={isDraggable}
@@ -94,38 +93,15 @@ const InternalRowContainer = <T extends TableItem>({
             />
           );
         })}
-      {isExpanded &&
-        childrenRows !== undefined &&
-        childrenRows.length > 0 &&
-        hasHelperRowComponent && (
-          <tr key={`extra-helper-row-${parentRowIndex}`}>
-            <DataCell
-              // align={align}
-              // display={display}
-              // key={columnIndex}
-              // verticalAlign={verticalAlign}
-              colSpan={10000}
-              width={100}
-
-              // withPadding={withPadding}
-            >
-              <Box display="flex">
-                {/* {columnIndex === 0 && isExpandable && isSelectable && !isParentRow && (
-              <Checkbox
-                checked={isSelected}
-                hiddenLabel
-                label={label}
-                onChange={onChange}
-                width={0}
-              />
-            )} */}
-                {/*
+      {isExpanded && childrenRows !== undefined && hasHelperRowComponent && (
+        <tr key={`extra-helper-row-${parentRowIndex}`}>
+          <DataCell checkEmptyCell={true} colSpan={10000} width={100}>
+            {/*
 // @ts-expect-error https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20544 */}
-                <HelperRow parentRowIndex={parentRowIndex} />
-              </Box>
-            </DataCell>
-          </tr>
-        )}
+            <HelperRow parentRowIndex={parentRowIndex} />
+          </DataCell>
+        </tr>
+      )}
     </>
   );
 };

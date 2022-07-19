@@ -12,9 +12,9 @@ export interface TableSelectable {
 
 export interface TableExpandable<T> {
   expandedRows: Record<string, true>;
-  onExpandedChange(expandedItems: Record<string, true>): void;
   expandedRowSelector: (item: T) => T[] | undefined;
-  render?:
+  onExpandedChange(expandedItems: Record<string, true>, expandedIndex: number): void;
+  renderHelperRow?:
     | ComponentType<{ parentRowIndex: number; children?: ReactNode }>
     | ((props: { parentRowIndex: number; children?: ReactNode }, context?: any) => ReactNode);
 }

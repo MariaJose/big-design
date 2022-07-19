@@ -16,7 +16,7 @@ interface PrivateProps {
 }
 
 export interface RowProps<T> extends TableHTMLAttributes<HTMLTableRowElement> {
-  childrenRows: T[];
+  childrenRows?: T[];
   childRowIndex?: number;
   columns: Array<TableColumn<T>>;
   headerCellWidths: Array<number | string>;
@@ -56,7 +56,7 @@ const InternalRow = <T extends TableItem>({
   isParentRow = false,
   ...rest
 }: RowProps<T> & PrivateProps) => {
-  const { hasChildrenRows, label, onChange, onExpandedChange, isChecked, isIndeterminate } =
+  const { hasChildrenRows, isChecked, isIndeterminate, label, onChange, onExpandedChange } =
     useRowState({
       childRowIndex,
       childrenRows,
@@ -107,6 +107,7 @@ const InternalRow = <T extends TableItem>({
   };
 
   const renderExpandedIconCell = () => {
+    // TODO: Check this
     if (isExpandable && isParentRow && hasChildrenRows) {
       const needsHorizontalPadding = !isSelectable && !isDraggable;
 
