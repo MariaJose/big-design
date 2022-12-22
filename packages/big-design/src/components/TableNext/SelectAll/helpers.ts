@@ -1,5 +1,5 @@
 import { getPagedIndex } from '../helpers';
-import { TableSelectable } from '../types';
+import { TableExpandable, TableSelectable } from '../types';
 
 import { SelectAllProps } from './SelectAll';
 
@@ -9,32 +9,89 @@ export function getTotalSelectedItems(selectedItems: TableSelectable['selectedIt
   return Object.keys(selectedItems).filter((key) => !key.includes('.')).length;
 }
 
-export function areAllInPageSelected<T>({ items, selectedItems, pagination }: SelectAllRowsArg<T>) {
+export function getChildrenRows<T>(
+  parentRow: T,
+  expandedRowSelector?: TableExpandable<T>['expandedRowSelector'],
+) {
+  const expandedRowMode = expandedRowSelector !== undefined;
+
+  if (!expandedRowMode) {
+    return [];
+  }
+
+  return expandedRowSelector(parentRow) ?? [];
+}
+
+export function areAllInPageSelected<T>({
+  isExpandable,
+  items,
+  selectedItems,
+  expandedRowSelector,
+  pagination,
+}: SelectAllRowsArg<T>) {
   if (items.length <= 0) {
     return false;
   }
 
-  return items.every((_, parentRowIndex) => {
+  return items.every((parentRow, parentRowIndex) => {
     const pagedIndex = getPagedIndex(parentRowIndex, pagination);
+    const childrenRows: T[] = getChildrenRows(parentRow, expandedRowSelector);
 
-    return selectedItems[pagedIndex] !== undefined;
+    // Not need to check childrens since expandable mode is not used.
+    if (!isExpandable || childrenRows.length === 0) {
+      return selectedItems[pagedIndex] !== undefined;
+    }
+
+    return areAllParentsAndChildrenSelected(childrenRows, selectedItems, pagedIndex);
   });
 }
 
 export function areSomeInPageSelected<T>({
+  isExpandable,
   items,
   selectedItems,
+  expandedRowSelector,
   pagination,
 }: SelectAllRowsArg<T>): boolean {
   if (items.length <= 0) {
     return false;
   }
 
-  return items.some((_, parentRowIndex) => {
+  return items.some((parentRow, parentRowIndex) => {
     const pagedIndex = getPagedIndex(parentRowIndex, pagination);
+    const childrenRows: T[] = getChildrenRows(parentRow, expandedRowSelector);
 
-    return selectedItems[pagedIndex] !== undefined;
+    // Not need to check childrens since expandable mode is not used.
+    if (!isExpandable || childrenRows.length === 0) {
+      return selectedItems[pagedIndex] !== undefined;
+    }
+
+    return areSomeParentsAndChildrenSelected(childrenRows, selectedItems, pagedIndex);
   });
+}
+
+function areAllParentsAndChildrenSelected<T>(
+  childrenRows: T[],
+  selectedItems: TableSelectable['selectedItems'],
+  pagedIndex: number,
+) {
+  const allChildrenRowsSelected = childrenRows.every((_childRow, childRowIndex) => {
+    return selectedItems[`${pagedIndex}.${childRowIndex}`] !== undefined;
+  });
+
+  return selectedItems[pagedIndex] !== undefined && allChildrenRowsSelected;
+}
+
+function areSomeParentsAndChildrenSelected<T>(
+  childrenRows: T[],
+  selectedItems: TableSelectable['selectedItems'],
+  pagedIndex: number,
+) {
+  const someChildrenRowsInPageSelected = childrenRows.some((_childRow, childRowIndex) => {
+    return selectedItems[`${pagedIndex}.${childRowIndex}`] !== undefined;
+  });
+
+  return selectedItems[pagedIndex] !== undefined && someChildrenRowsInPageSelected;
 }
 
 function deselectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
@@ -42,9 +99,8 @@ function deselectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
 
   const filteredSelectedItems = Object.keys(selectedItems)
     .filter((selectedKey) => {
-      const item = items.find(
-        (_, index) => getPagedIndex(index, pagination) === parseInt(selectedKey, 10),
-      );
+      const [parentIndex] = selectedKey.split('.').map((key) => parseInt(key, 10));
+      const item = items.find((_, index) => getPagedIndex(index, pagination) === parentIndex);
 
       return !item;
     })
@@ -54,10 +110,19 @@ function deselectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
 }
 
 function selectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
-  const { items, selectedItems, pagination } = params;
+  const { isExpandable, items, selectedItems, expandedRowSelector, pagination } = params;
 
-  const newSelectedItems = items.map((_, parentRowIndex) => {
+  const newSelectedItems = items.map((parentRow, parentRowIndex) => {
     const pagedIndex = getPagedIndex(parentRowIndex, pagination);
+    const childrenRows: T[] = getChildrenRows(parentRow, expandedRowSelector);
+
+    if (isExpandable) {
+      const newSelectedChildrenRows = childrenRows.map<[string, true]>((_child, childRowIndex) => {
+        return [`${pagedIndex}.${childRowIndex}`, true];
+      });
+
+      return [[`${pagedIndex}`, true], ...newSelectedChildrenRows];
+    }
 
     return [[`${pagedIndex}`, true]];
   });

@@ -70,6 +70,8 @@ const InternalActions = <T extends TableItem>({
     >
       {isSelectable && (
         <SelectAll
+          expandedRowSelector={expandedRowSelector}
+          isExpandable={isExpandable}
           items={items}
           onChange={onSelectionChange}
           pagination={pagination}

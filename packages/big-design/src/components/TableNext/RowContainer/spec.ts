@@ -15,6 +15,7 @@ const columns: Array<TableColumn<Item>> = [
   { hash: 'stock', header: 'Stock', render: ({ stock }) => stock },
 ];
 
+// TODO: add more tests if necessary
 test('should increment for draggable row', () => {
   const totalColSpans = calculateColSpan({
     columns,

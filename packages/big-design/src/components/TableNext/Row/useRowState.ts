@@ -1,19 +1,25 @@
 import { OnItemSelectFn } from '../hooks';
+import { TableSelectable } from '../types';
 
 interface UseRowStateProps<T> {
   childRowIndex?: number;
   childrenRows?: T[];
+  isExpandable: boolean;
   isParentRow: boolean;
   isSelected?: boolean;
+  selectedItems: TableSelectable['selectedItems'];
   onExpandedRow?(parentRowIndex: number | null): void;
   onItemSelect?: OnItemSelectFn;
   parentRowIndex: number;
 }
 
 export const useRowState = <T>({
+  childRowIndex,
   childrenRows,
+  isExpandable,
   isParentRow,
   isSelected,
+  selectedItems,
   onExpandedRow,
   onItemSelect,
   parentRowIndex,
@@ -21,7 +27,10 @@ export const useRowState = <T>({
   const onChange = () => {
     if (onItemSelect) {
       onItemSelect({
+        childRowIndex: childRowIndex ?? null,
+        childrenRows: childrenRows ?? [],
         isParentRow,
+        isExpandable,
         parentRowIndex,
       });
     }
@@ -35,11 +44,29 @@ export const useRowState = <T>({
 
   const hasChildrenRows = Array.isArray(childrenRows);
 
+  const allChildrenRowsSelected =
+    isExpandable &&
+    childrenRows?.every((_childRow, childRowIndex) => {
+      return selectedItems[`${parentRowIndex}.${childRowIndex}`] !== undefined;
+    });
+
+  const someChildrenRowsSelected =
+    isExpandable &&
+    childrenRows?.some((_childRow, childRowIndex) => {
+      return selectedItems[`${parentRowIndex}.${childRowIndex}`] !== undefined;
+    });
+
+  const isChecked = isExpandable && hasChildrenRows ? allChildrenRowsSelected : isSelected;
+
+  const isIndeterminate = isExpandable && hasChildrenRows ? someChildrenRowsSelected : undefined;
+
   const label = isSelected ? `Selected` : `Unselected`;
 
   return {
     hasChildrenRows,
-    isChecked: isSelected,
+    // isChecked: isSelected,
+    isChecked,
+    isIndeterminate,
     label,
     onChange,
     onExpandedChange,

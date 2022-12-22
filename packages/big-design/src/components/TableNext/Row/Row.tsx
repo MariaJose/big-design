@@ -64,27 +64,37 @@ const InternalRow = <T extends TableItem>({
   isParentRow = false,
   ...rest
 }: RowProps<T> & PrivateProps) => {
-  const { hasChildrenRows, isChecked, label, onChange, onExpandedChange } = useRowState({
-    childrenRows,
-    isParentRow,
-    isSelected,
-    onExpandedRow,
-    onItemSelect,
-    parentRowIndex,
-  });
+  const { hasChildrenRows, isChecked, isIndeterminate, label, onChange, onExpandedChange } =
+    useRowState({
+      childRowIndex,
+      childrenRows,
+      isExpandable,
+      isParentRow,
+      isSelected,
+      onExpandedRow,
+      onItemSelect,
+      selectedItems,
+      parentRowIndex,
+    });
 
   const renderSelectDataCell = () => {
     if (isSelectable && isParentRow) {
       return (
         <DataCell isCheckbox={true} isExpandable={isExpandable} key="data-checkbox" width={10}>
-          <Checkbox checked={isChecked} hiddenLabel label={label} onChange={onChange} width={0} />
+          <Checkbox
+            checked={isChecked}
+            hiddenLabel
+            isIndeterminate={isIndeterminate}
+            label={label}
+            onChange={onChange}
+            width={0}
+          />
         </DataCell>
       );
     }
 
     return null;
   };
-
   const renderDragIconCell = () => {
     if (showDragIcon && isParentRow) {
       return (
@@ -96,7 +106,6 @@ const InternalRow = <T extends TableItem>({
 
     return null;
   };
-
   const renderExpandedIconCell = () => {
     if (isExpandable && isParentRow && hasChildrenRows) {
       const needsHorizontalPadding = !isSelectable && !isDraggable;
@@ -114,7 +123,6 @@ const InternalRow = <T extends TableItem>({
 
     return null;
   };
-
   const renderExtraCellsForParentRow = (): ReactNode[] => {
     if (!hasChildrenRows) {
       return [<DataCell key={`parent-extra-cell-${parentRowIndex}-1`} />];
@@ -122,7 +130,6 @@ const InternalRow = <T extends TableItem>({
 
     return [];
   };
-
   const renderExtraCellsForChildRow = () => {
     const extraDataCells: ReactNode[] = [<DataCell key={`child-extra-cell-${childRowIndex}-0`} />];
 
@@ -144,7 +151,6 @@ const InternalRow = <T extends TableItem>({
       {renderExpandedIconCell()}
       {isParentRow && isExpandable && renderExtraCellsForParentRow()}
       {isExpandable && !isParentRow && renderExtraCellsForChildRow()}
-
       {columns.map(
         (
           { render: CellContent, align, display, verticalAlign, width, withPadding = true },
@@ -166,7 +172,17 @@ const InternalRow = <T extends TableItem>({
                 flexDirection="row"
                 justifyContent={align && ALIGN_MAP[align]}
               >
-                {/* @ts-expect-error https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20544 */}
+                {columnIndex === 0 && isExpandable && isSelectable && !isParentRow && (
+                  <Checkbox
+                    checked={isSelected}
+                    hiddenLabel
+                    label={label}
+                    onChange={onChange}
+                    width={0}
+                  />
+                )}
+                {/*
+          // @ts-expect-error https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20544 */}
                 <CellContent {...item} />
               </Flex>
             </DataCell>
