@@ -4,7 +4,7 @@ import { typedMemo } from '../../../utils';
 import { StyleableButton } from '../../Button/Button';
 import { DataCell } from '../DataCell';
 import { Row, RowProps } from '../Row';
-import { TableExpandable, TableItem } from '../types';
+import { TableExpandable, TableItem, TableSelectable } from '../types';
 
 import { calculateColSpan } from './helpers';
 
@@ -15,6 +15,7 @@ interface InternalRowContainerProps<T>
   getItemKey: (item: T, index: number) => string | number;
   headerless?: boolean;
   getLoadMoreAction?: TableExpandable<T>['getLoadMoreAction'];
+  areChildrenRowsSelectable?: TableSelectable['areChildrenRowsSelectable'];
 }
 
 interface PrivateProps {
@@ -37,6 +38,7 @@ const InternalRowContainer = <T extends TableItem>({
   getItemKey,
   onItemSelect,
   onExpandedRow,
+  areChildrenRowsSelectable = false,
   selectedItems,
   ...rest
 }: InternalRowContainerProps<T> & PrivateProps) => {
@@ -77,6 +79,7 @@ const InternalRowContainer = <T extends TableItem>({
 
           return (
             <Row
+              areChildrenRowsSelectable={areChildrenRowsSelectable}
               childRowIndex={childRowIndex}
               childrenRows={childrenRows ?? []}
               columns={columns}
@@ -86,8 +89,8 @@ const InternalRowContainer = <T extends TableItem>({
               isExpandable={isExpandable}
               isParentRow={false}
               isSelectable={isSelectable}
-              isSelected={isChildRowSelected}
               // isSelectable={isSelectable} // for rendering extra cells
+              isSelected={isChildRowSelected}
               item={childRow}
               key={key}
               onItemSelect={onItemSelect}

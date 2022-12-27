@@ -75,5 +75,6 @@ export const useSelectable = (selectable?: TableSelectable) => {
     isSelectable,
     onItemSelect: isSelectable ? onItemSelectEventCallback : undefined,
     selectedItems,
+    areChildrenRowsSelectable: selectable?.areChildrenRowsSelectable,
   };
 };

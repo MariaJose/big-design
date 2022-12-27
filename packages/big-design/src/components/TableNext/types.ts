@@ -8,6 +8,7 @@ import { TableColumnDisplayProps } from './mixins';
 export interface TableSelectable {
   selectedItems: Record<string, true>;
   onSelectionChange(selectedItems: Record<string, true>): void;
+  areChildrenRowsSelectable?: boolean;
 }
 export interface LoadMoreAction {
   isLoading: boolean;

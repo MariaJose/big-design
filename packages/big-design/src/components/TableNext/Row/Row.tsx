@@ -38,7 +38,8 @@ export interface RowProps<T> extends TableHTMLAttributes<HTMLTableRowElement> {
   item: T;
   parentRowIndex: number;
   selectedItems: TableSelectable['selectedItems'];
-  showDragIcon?: boolean;
+  showDragIcon?: TableSelectable['areChildrenRowsSelectable'];
+  areChildrenRowsSelectable?: boolean;
   onExpandedRow?(parentRowIndex: number | null): void;
   onItemSelect?: OnItemSelectFn;
 }
@@ -62,6 +63,7 @@ const InternalRow = <T extends TableItem>({
   isExpanded = false,
   selectedItems,
   isParentRow = false,
+  areChildrenRowsSelectable,
   ...rest
 }: RowProps<T> & PrivateProps) => {
   const { hasChildrenRows, isChecked, isIndeterminate, label, onChange, onExpandedChange } =
@@ -172,15 +174,19 @@ const InternalRow = <T extends TableItem>({
                 flexDirection="row"
                 justifyContent={align && ALIGN_MAP[align]}
               >
-                {columnIndex === 0 && isExpandable && isSelectable && !isParentRow && (
-                  <Checkbox
-                    checked={isSelected}
-                    hiddenLabel
-                    label={label}
-                    onChange={onChange}
-                    width={0}
-                  />
-                )}
+                {columnIndex === 0 &&
+                  isExpandable &&
+                  isSelectable &&
+                  !isParentRow &&
+                  areChildrenRowsSelectable && (
+                    <Checkbox
+                      checked={isSelected}
+                      hiddenLabel
+                      label={label}
+                      onChange={onChange}
+                      width={0}
+                    />
+                  )}
                 {/*
           // @ts-expect-error https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20544 */}
                 <CellContent {...item} />

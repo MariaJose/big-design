@@ -47,7 +47,8 @@ const InternalTableNext = <T extends TableItem>(
   const tableIdRef = useRef(id || uniqueTableId);
   const [headerCellWidths, setHeaderCellWidths] = useState<Array<number | string>>([]);
   const headerCellIconRef = useRef<HTMLTableCellElement>(null);
-  const { isSelectable, onItemSelect, selectedItems } = useSelectable(selectable);
+  const { isSelectable, onItemSelect, selectedItems, areChildrenRowsSelectable } =
+    useSelectable(selectable);
   const { expandedRows, expandedRowSelector, isExpandable, onExpandedRow, setExpandedRows } =
     useExpandable(expandable);
 
@@ -175,6 +176,7 @@ const InternalTableNext = <T extends TableItem>(
                     isDragging={snapshot.isDragging}
                     {...provided.dragHandleProps}
                     {...provided.draggableProps}
+                    areChildrenRowsSelectable={areChildrenRowsSelectable}
                     columns={columns}
                     expandedRowSelector={expandedRowSelector}
                     expandedRows={expandedRows}
@@ -213,6 +215,7 @@ const InternalTableNext = <T extends TableItem>(
 
           return (
             <RowContainer
+              areChildrenRowsSelectable={areChildrenRowsSelectable}
               columns={columns}
               expandedRowSelector={expandedRowSelector}
               expandedRows={expandedRows}
