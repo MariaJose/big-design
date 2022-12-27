@@ -64,7 +64,6 @@ export const useRowState = <T>({
 
   return {
     hasChildrenRows,
-    // isChecked: isSelected,
     isChecked,
     isIndeterminate,
     label,

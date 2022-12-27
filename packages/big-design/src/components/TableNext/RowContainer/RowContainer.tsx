@@ -89,7 +89,6 @@ const InternalRowContainer = <T extends TableItem>({
               isExpandable={isExpandable}
               isParentRow={false}
               isSelectable={isSelectable}
-              // isSelectable={isSelectable} // for rendering extra cells
               isSelected={isChildRowSelected}
               item={childRow}
               key={key}

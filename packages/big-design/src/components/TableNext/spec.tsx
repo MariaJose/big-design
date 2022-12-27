@@ -710,7 +710,7 @@ describe('selectable', () => {
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  test('renders selectable actions, checkboxes when having parent rows and children rows', () => {
+  test('renders selectable actions, checkboxes when having parent rows and children rows and areChildrenRowsSelectable is true', () => {
     const { container, getAllByRole } = render(
       <TableNext
         columns={columns}
@@ -724,12 +724,37 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: {},
+          areChildrenRowsSelectable: true,
         }}
       />,
     );
 
     // One per parent row and child row + Actions (select all) checkbox
     expect(getAllByRole('checkbox')).toHaveLength(items.length + mockChildrenRows.length * 3 + 1);
+    expect(container.firstChild).toMatchSnapshot();
+  });
+
+  test('renders selectable actions, checkboxes when having parent rows and children rows and areChildrenRowsSelectable is false', () => {
+    const { container, getAllByRole } = render(
+      <TableNext
+        columns={columns}
+        expandable={{
+          expandedRows: { 0: true, 1: true, 2: true },
+          onExpandedChange,
+          expandedRowSelector: ({ children }) => children,
+        }}
+        itemName={itemName}
+        items={items}
+        selectable={{
+          onSelectionChange,
+          selectedItems: {},
+          areChildrenRowsSelectable: false,
+        }}
+      />,
+    );
+
+    // One per parent row + Actions (select all) checkbox
+    expect(getAllByRole('checkbox')).toHaveLength(items.length + 1);
     expect(container.firstChild).toMatchSnapshot();
   });
 
@@ -955,6 +980,7 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: {},
+          areChildrenRowsSelectable: true,
         }}
       />,
     );
@@ -985,6 +1011,7 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: { '0': true, '0.0': true },
+          areChildrenRowsSelectable: true,
         }}
       />,
     );
