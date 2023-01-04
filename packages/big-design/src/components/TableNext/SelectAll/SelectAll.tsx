@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 
 import { Checkbox } from '../../Checkbox';
 import { Flex, FlexItem } from '../../Flex';
 import { Text } from '../../Typography';
+// import { ActionsProps } from '../Actions';
 // import { TableItem, TablePaginationProps, TableSelectable } from '../types';
 import { TableExpandable, TableItem, TablePaginationProps, TableSelectable } from '../types';
 
@@ -16,6 +17,12 @@ export interface SelectAllProps<T> {
   selectedItems: TableSelectable['selectedItems'];
   totalItems: number;
   pagination?: TablePaginationProps;
+  // TODO: check types
+  getRowId?: (item: T) => string;
+  // selectedItemsRecord: ActionsProps<T>['selectedItemsRecord'];
+  setSelectedItemsRecord: Dispatch<SetStateAction<Set<string>>>;
+  // selectedItemsRecord: Set<string> | undefined;
+  selectedItemsRecord: Set<string>;
 }
 
 export const SelectAll = <T extends TableItem>(props: SelectAllProps<T>) => {

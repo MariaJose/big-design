@@ -8,9 +8,13 @@ interface UseRowStateProps<T> {
   isParentRow: boolean;
   isSelected?: boolean;
   selectedItems: TableSelectable['selectedItems'];
-  onExpandedRow?(parentRowIndex: number | null): void;
+  onExpandedRow?(parentRowIndex: number | null, parentRowId: string | undefined): void;
   onItemSelect?: OnItemSelectFn;
   parentRowIndex: number;
+  rowId?: string;
+  // TODO: update this
+  getRowId?: (item: T) => string;
+  parentRowId?: string;
 }
 
 export const useRowState = <T>({
@@ -23,6 +27,9 @@ export const useRowState = <T>({
   onExpandedRow,
   onItemSelect,
   parentRowIndex,
+  rowId,
+  getRowId,
+  parentRowId,
 }: UseRowStateProps<T>) => {
   const onChange = () => {
     if (onItemSelect) {
@@ -32,13 +39,16 @@ export const useRowState = <T>({
         isParentRow,
         isExpandable,
         parentRowIndex,
+        rowId,
+        getRowId,
+        parentRowId,
       });
     }
   };
 
   const onExpandedChange = () => {
     if (onExpandedRow) {
-      onExpandedRow(parentRowIndex ?? null);
+      onExpandedRow(parentRowIndex ?? null, parentRowId);
     }
   };
 
@@ -46,13 +56,22 @@ export const useRowState = <T>({
 
   const allChildrenRowsSelected =
     isExpandable &&
-    childrenRows?.every((_childRow, childRowIndex) => {
-      return selectedItems[`${parentRowIndex}.${childRowIndex}`] !== undefined;
+    childrenRows?.every((childRow, childRowIndex) => {
+      if (rowId !== undefined && getRowId) {
+        return selectedItems[getRowId(childRow)] !== undefined;
+        // eslint-disable-next-line no-else-return
+      } else {
+        return selectedItems[`${parentRowIndex}.${childRowIndex}`] !== undefined;
+      }
     });
 
   const someChildrenRowsSelected =
     isExpandable &&
-    childrenRows?.some((_childRow, childRowIndex) => {
+    childrenRows?.some((childRow, childRowIndex) => {
+      if (rowId !== undefined && getRowId) {
+        return selectedItems[getRowId(childRow)] !== undefined;
+      }
+
       return selectedItems[`${parentRowIndex}.${childRowIndex}`] !== undefined;
     });
 

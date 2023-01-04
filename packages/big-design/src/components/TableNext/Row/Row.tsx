@@ -40,8 +40,12 @@ export interface RowProps<T> extends TableHTMLAttributes<HTMLTableRowElement> {
   selectedItems: TableSelectable['selectedItems'];
   showDragIcon?: TableSelectable['areChildrenRowsSelectable'];
   areChildrenRowsSelectable?: boolean;
-  onExpandedRow?(parentRowIndex: number | null): void;
+  // TODO: update this
+  onExpandedRow?(parentRowIndex: number | null, parentRowId?: string | undefined): void;
   onItemSelect?: OnItemSelectFn;
+  // TODO: Update type
+  getRowId?: (item: T) => string;
+  parentRowId?: string;
 }
 
 const InternalRow = <T extends TableItem>({
@@ -64,6 +68,8 @@ const InternalRow = <T extends TableItem>({
   selectedItems,
   isParentRow = false,
   areChildrenRowsSelectable,
+  getRowId,
+  parentRowId,
   ...rest
 }: RowProps<T> & PrivateProps) => {
   const { hasChildrenRows, isChecked, isIndeterminate, label, onChange, onExpandedChange } =
@@ -77,6 +83,8 @@ const InternalRow = <T extends TableItem>({
       onItemSelect,
       selectedItems,
       parentRowIndex,
+      parentRowId,
+      getRowId,
     });
 
   const renderSelectDataCell = () => {

@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React, { Dispatch, RefObject, SetStateAction } from 'react';
 
 import { typedMemo } from '../../../utils';
 import { FlexItem } from '../../Flex';
@@ -21,6 +21,10 @@ export interface ActionsProps<T> {
   tableId: string;
   expandedRowSelector?: TableExpandable<T>['expandedRowSelector'];
   onSelectionChange?: TableSelectable['onSelectionChange'];
+  // TODO: check types
+  getRowId?: (item: T) => string;
+  setSelectedItemsRecord: Dispatch<SetStateAction<Set<string>>>;
+  selectedItemsRecord: Set<string>;
 }
 
 const InternalActions = <T extends TableItem>({
@@ -35,6 +39,9 @@ const InternalActions = <T extends TableItem>({
   isExpandable,
   expandedRowSelector,
   onSelectionChange,
+  getRowId,
+  setSelectedItemsRecord,
+  selectedItemsRecord,
   ...props
 }: ActionsProps<T>) => {
   const isSelectable = typeof onSelectionChange === 'function';
@@ -71,11 +78,14 @@ const InternalActions = <T extends TableItem>({
       {isSelectable && (
         <SelectAll
           expandedRowSelector={expandedRowSelector}
+          getRowId={getRowId}
           isExpandable={isExpandable}
           items={items}
           onChange={onSelectionChange}
           pagination={pagination}
           selectedItems={selectedItems}
+          selectedItemsRecord={selectedItemsRecord}
+          setSelectedItemsRecord={setSelectedItemsRecord}
           totalItems={totalItems}
         />
       )}

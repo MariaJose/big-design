@@ -7,11 +7,12 @@ import {
 import { SelectAllProps } from './SelectAll';
 
 export const useSelectAllState = <T>(props: SelectAllProps<T>) => {
-  const { selectedItems, onChange } = props;
+  const { onChange } = props;
 
   const allInPageSelected = areAllInPageSelected(props);
   const someInPageSelected = areSomeInPageSelected(props);
-  const totalSelectedItems = getTotalSelectedItems(selectedItems);
+  const totalSelectedItems =
+    props.getRowId !== undefined ? props.selectedItemsRecord.size : getTotalSelectedItems(props);
   const label = allInPageSelected ? 'Deselect All' : 'Select All';
 
   const handleSelectAll = () => {

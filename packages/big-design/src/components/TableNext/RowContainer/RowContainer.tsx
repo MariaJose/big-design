@@ -16,6 +16,8 @@ interface InternalRowContainerProps<T>
   headerless?: boolean;
   getLoadMoreAction?: TableExpandable<T>['getLoadMoreAction'];
   areChildrenRowsSelectable?: TableSelectable['areChildrenRowsSelectable'];
+  // TODO: update the type
+  getRowId?: (item: T) => string;
 }
 
 interface PrivateProps {
@@ -40,10 +42,16 @@ const InternalRowContainer = <T extends TableItem>({
   onExpandedRow,
   areChildrenRowsSelectable = false,
   selectedItems,
+  getRowId,
   ...rest
 }: InternalRowContainerProps<T> & PrivateProps) => {
-  const isParentRowSelected = selectedItems[parentRowIndex] !== undefined;
-  const isExpanded = expandedRows[parentRowIndex] !== undefined;
+  const isParentRowSelected =
+    getRowId !== undefined
+      ? selectedItems[getRowId(item)] !== undefined
+      : selectedItems[parentRowIndex] !== undefined;
+  const parentRowId = getRowId !== undefined ? getRowId(item) : undefined;
+  // TODO: chck this.
+  const isExpanded = expandedRows[parentRowId ?? parentRowIndex] !== undefined;
   const childrenRows: T[] | undefined = expandedRowSelector ? expandedRowSelector?.(item) : [];
   const isDraggable: boolean = showDragIcon === true;
   const loadMoreAction = getLoadMoreAction?.(parentRowIndex);
@@ -53,6 +61,7 @@ const InternalRowContainer = <T extends TableItem>({
       <Row
         childrenRows={childrenRows}
         columns={columns}
+        getRowId={getRowId}
         headerCellWidths={headerCellWidths}
         isDraggable={isDraggable}
         isDragging={isDragging}
@@ -64,6 +73,7 @@ const InternalRowContainer = <T extends TableItem>({
         item={item}
         onExpandedRow={onExpandedRow}
         onItemSelect={onItemSelect}
+        parentRowId={parentRowId}
         parentRowIndex={parentRowIndex}
         ref={forwardedRef}
         selectedItems={selectedItems}
@@ -74,8 +84,11 @@ const InternalRowContainer = <T extends TableItem>({
         isExpanded &&
         childrenRows?.map((childRow: T, childRowIndex: number) => {
           const key = getItemKey(childRow, childRowIndex);
+
           const isChildRowSelected =
-            selectedItems[`${parentRowIndex}.${childRowIndex}`] !== undefined;
+            getRowId !== undefined
+              ? selectedItems[getRowId(childRow)] !== undefined
+              : selectedItems[`${parentRowIndex}.${childRowIndex}`] !== undefined;
 
           return (
             <Row
@@ -83,6 +96,7 @@ const InternalRowContainer = <T extends TableItem>({
               childRowIndex={childRowIndex}
               childrenRows={childrenRows ?? []}
               columns={columns}
+              getRowId={getRowId}
               headerCellWidths={headerCellWidths}
               isDraggable={isDraggable}
               isDragging={false}
@@ -93,6 +107,7 @@ const InternalRowContainer = <T extends TableItem>({
               item={childRow}
               key={key}
               onItemSelect={onItemSelect}
+              parentRowId={parentRowId}
               parentRowIndex={parentRowIndex}
               selectedItems={selectedItems}
               showDragIcon={showDragIcon}

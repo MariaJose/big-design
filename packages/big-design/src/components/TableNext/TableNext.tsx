@@ -39,6 +39,7 @@ const InternalTableNext = <T extends TableItem>(
     stickyHeader,
     style,
     onRowDrop,
+    getRowId,
     ...rest
   } = props;
 
@@ -47,8 +48,14 @@ const InternalTableNext = <T extends TableItem>(
   const tableIdRef = useRef(id || uniqueTableId);
   const [headerCellWidths, setHeaderCellWidths] = useState<Array<number | string>>([]);
   const headerCellIconRef = useRef<HTMLTableCellElement>(null);
-  const { isSelectable, onItemSelect, selectedItems, areChildrenRowsSelectable } =
-    useSelectable(selectable);
+  const {
+    isSelectable,
+    onItemSelect,
+    selectedItems,
+    areChildrenRowsSelectable,
+    setSelectedItemsRecord,
+    selectedItemsRecord,
+  } = useSelectable(selectable);
   const { expandedRows, expandedRowSelector, isExpandable, onExpandedRow, setExpandedRows } =
     useExpandable(expandable);
 
@@ -182,6 +189,7 @@ const InternalTableNext = <T extends TableItem>(
                     expandedRows={expandedRows}
                     getItemKey={getItemKey}
                     getLoadMoreAction={expandable?.getLoadMoreAction}
+                    getRowId={getRowId}
                     headerCellWidths={headerCellWidths}
                     isExpandable={isExpandable}
                     isSelectable={isSelectable}
@@ -221,6 +229,7 @@ const InternalTableNext = <T extends TableItem>(
               expandedRows={expandedRows}
               getItemKey={getItemKey}
               getLoadMoreAction={expandable?.getLoadMoreAction}
+              getRowId={getRowId}
               headerCellWidths={headerCellWidths}
               headerless={headerless}
               isExpandable={isExpandable}
@@ -252,12 +261,15 @@ const InternalTableNext = <T extends TableItem>(
           customActions={actions}
           expandedRowSelector={expandedRowSelector}
           forwardedRef={actionsRef}
+          getRowId={getRowId}
           isExpandable={isExpandable}
           itemName={itemName}
           items={items}
           onSelectionChange={selectable && selectable.onSelectionChange}
           pagination={pagination}
           selectedItems={selectedItems}
+          selectedItemsRecord={selectedItemsRecord}
+          setSelectedItemsRecord={setSelectedItemsRecord}
           stickyHeader={stickyHeader}
           tableId={tableIdRef.current}
         />
@@ -289,3 +301,8 @@ export const TableNext = typedMemo(InternalTableNext);
 export const TableFigureNext: React.FC<{ children?: React.ReactNode } & MarginProps> = memo(
   (props) => <StyledTableFigure {...props} />,
 );
+
+// getRowId   (item) => item.id
+
+// getRowId   (item, parentRowIndex, index) => parentRowIndex + . + index
+//

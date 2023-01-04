@@ -10,9 +10,14 @@ import {
   SelectRowArg,
 } from './helpers';
 
-interface OnItemSelectFnArg<T> extends Omit<SelectRowArg<T>, 'childRowIndex' | 'selectedItems'> {
+interface OnItemSelectFnArg<T>
+  extends Omit<SelectRowArg<T>, 'childRowIndex' | 'selectedItems' | 'setSelectedItemsRecord'> {
   childRowIndex: number | null;
   isParentRow: boolean;
+  rowId?: string;
+  getRowId?: (item: T) => string;
+  parentRowId?: string;
+  // setSelectedItemsRecord: Dispatch<SetStateAction<Set<string> | undefined>>;
 }
 
 export type OnItemSelectFn = <T>({
@@ -21,14 +26,27 @@ export type OnItemSelectFn = <T>({
   isParentRow,
   isExpandable,
   parentRowIndex,
+  // rowId,
+  getRowId,
+  parentRowId,
 }: OnItemSelectFnArg<T>) => void;
 
 export const useSelectable = (selectable?: TableSelectable) => {
   const isSelectable = Boolean(selectable);
   const [selectedItems, setSelectedItems] = useState<TableSelectable['selectedItems']>({});
+  // TODO: check types
+  const [selectedItemsRecord, setSelectedItemsRecord] = useState<Set<string>>(new Set());
 
   const onItemSelectEventCallback: OnItemSelectFn = useEventCallback(
-    ({ childRowIndex, childrenRows, isParentRow, isExpandable, parentRowIndex }) => {
+    ({
+      childRowIndex,
+      childrenRows,
+      isParentRow,
+      isExpandable,
+      parentRowIndex,
+      getRowId,
+      parentRowId,
+    }) => {
       if (!selectable) {
         return;
       }
@@ -41,23 +59,33 @@ export const useSelectable = (selectable?: TableSelectable) => {
           isExpandable,
           parentRowIndex,
           selectedItems,
+          getRowId,
+          parentRowId,
+          setSelectedItemsRecord,
         });
 
         onSelectionChange(newSelectedItems);
-      } else if (childRowIndex !== null) {
+      } else if (childRowIndex !== null || parentRowId !== undefined || getRowId !== undefined) {
         const totalSelectedChildRows = getTotalSelectedChildRows({
           childrenRows,
           parentRowIndex,
           selectedItems,
+          getRowId,
+          parentRowId,
+          setSelectedItemsRecord,
         });
 
         const isTheOnlySelectedChildRow = totalSelectedChildRows === 1;
 
         const newSelectedItems = selectChildRow({
-          childRowIndex,
           isTheOnlySelectedChildRow,
           parentRowIndex,
           selectedItems,
+          childrenRows,
+          getRowId,
+          childRowIndex,
+          parentRowId,
+          setSelectedItemsRecord,
         });
 
         onSelectionChange(newSelectedItems);
@@ -76,5 +104,7 @@ export const useSelectable = (selectable?: TableSelectable) => {
     onItemSelect: isSelectable ? onItemSelectEventCallback : undefined,
     selectedItems,
     areChildrenRowsSelectable: selectable?.areChildrenRowsSelectable,
+    selectedItemsRecord,
+    setSelectedItemsRecord,
   };
 };

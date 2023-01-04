@@ -21,7 +21,8 @@ type LoadMoreActionCallback = (parentRowIndex: number) => LoadMoreAction | undef
 export interface TableExpandable<T> {
   expandedRows: Record<string, true>;
   expandedRowSelector: (item: T) => T[] | undefined;
-  onExpandedChange(expandedItems: Record<string, true>, expandedIndex: number): void;
+  // TODO: check this
+  onExpandedChange(expandedItems: Record<string, true>, expandedIndex: number | string): void;
   getLoadMoreAction?: LoadMoreActionCallback;
 }
 
@@ -69,4 +70,5 @@ export interface TableProps<T> extends TableHTMLAttributes<HTMLTableElement> {
   selectable?: TableSelectable;
   sortable?: TableSortable<T>;
   stickyHeader?: boolean;
+  getRowId?: (item: T) => string;
 }
