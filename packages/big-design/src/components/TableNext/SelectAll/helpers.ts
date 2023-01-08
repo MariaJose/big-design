@@ -5,19 +5,19 @@ import { SelectAllProps } from './SelectAll';
 
 type SelectAllRowsArg<T> = Omit<SelectAllProps<T>, 'onChange'>;
 
-export function getTotalSelectedItems<T>({ items, selectedItems, getRowId }: SelectAllRowsArg<T>) {
-  const totalSelectedItems = items.reduce((acc, parentRow, parentRowIndex) => {
-    const parentRowId = getRowId(parentRow, parentRowIndex);
+// export function getTotalSelectedItems<T>({ items, selectedItems, getRowId , hasInitialSelectedItems, setHasInitialSelectedItems}) {
+//   // const totalSelectedItems = items.reduce((acc, parentRow, parentRowIndex) => {
+//   //   const parentRowId = getRowId(parentRow, parentRowIndex);
 
-    if (selectedItems[parentRowId]) {
-      return acc + 1;
-    }
+//   //   if (selectedItems[parentRowId]) {
+//   //     return acc + 1;
+//   //   }
 
-    return acc;
-  }, 0);
+//   //   return acc;
+//   // }, 0);
 
-  return totalSelectedItems;
-}
+//   // return totalSelectedItems;
+// }
 
 export function getChildrenRows<T>(
   parentRow: T,

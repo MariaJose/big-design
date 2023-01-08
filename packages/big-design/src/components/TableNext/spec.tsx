@@ -287,10 +287,15 @@ describe('pagination', () => {
       />,
     );
 
-    getByRole('navigation', { name: '[Custom] Pagination' });
-    getByRole('button', { name: '[Custom label] 1-3 of 5' });
-    getByRole('button', { name: '[Custom] Previous page' });
-    getByRole('button', { name: '[Custom] Next page' });
+    const navigation = getByRole('navigation', { name: '[Custom] Pagination' });
+    const paginationDropdown = getByRole('button', { name: '[Custom label] 1-3 of 5' });
+    const previousButtonPage = getByRole('button', { name: '[Custom] Previous page' });
+    const nextButtonPage = getByRole('button', { name: '[Custom] Next page' });
+
+    expect(navigation).toBeVisible();
+    expect(paginationDropdown).toBeVisible();
+    expect(previousButtonPage).toBeVisible();
+    expect(nextButtonPage).toBeVisible();
   });
 
   test('selection persists indexes on other pages', async () => {
@@ -658,6 +663,8 @@ describe('pagination', () => {
         selectable={{
           selectedItems: { 0: true, 3: true, '3.0': true, 4: true },
           onSelectionChange: jest.fn(),
+          isChildrenRowsSelectable: true,
+          initialSelectedParentRows: ['0', '3', '4'],
         }}
       />,
     );
@@ -724,7 +731,7 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: {},
-          areChildrenRowsSelectable: true,
+          isChildrenRowsSelectable: true,
         }}
       />,
     );
@@ -734,7 +741,7 @@ describe('selectable', () => {
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  test('renders selectable actions, checkboxes when having parent rows and children rows and areChildrenRowsSelectable is false', () => {
+  test('renders selectable actions, checkboxes when having parent rows and children rows and isChildrenRowsSelectable is false', () => {
     const { container, getAllByRole } = render(
       <TableNext
         columns={columns}
@@ -748,7 +755,7 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: {},
-          areChildrenRowsSelectable: false,
+          isChildrenRowsSelectable: false,
         }}
       />,
     );
@@ -800,6 +807,7 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: {},
+          isChildrenRowsSelectable: true,
         }}
       />,
     );
@@ -912,6 +920,7 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: {},
+          isChildrenRowsSelectable: true,
         }}
       />,
     );
@@ -951,6 +960,8 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: { 0: true, '0.0': true, '0.1': true },
+          isChildrenRowsSelectable: true,
+          initialSelectedParentRows: ['0'],
         }}
       />,
     );
@@ -980,7 +991,7 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: {},
-          areChildrenRowsSelectable: true,
+          isChildrenRowsSelectable: true,
         }}
       />,
     );
@@ -1011,7 +1022,8 @@ describe('selectable', () => {
         selectable={{
           onSelectionChange,
           selectedItems: { '0': true, '0.0': true },
-          areChildrenRowsSelectable: true,
+          isChildrenRowsSelectable: true,
+          initialSelectedParentRows: ['0'],
         }}
       />,
     );
@@ -1298,7 +1310,7 @@ describe('expandable', () => {
 
     await userEvent.click(expandIcon);
 
-    expect(onExpandedChange).toHaveBeenCalledWith({ 0: true }, 0);
+    expect(onExpandedChange).toHaveBeenCalledWith({ 0: true }, '0');
     expect(onExpandedChange).not.toHaveBeenCalledWith({ 1: true });
     expect(onExpandedChange).not.toHaveBeenCalledWith({ 2: true });
   });
@@ -1321,7 +1333,7 @@ describe('expandable', () => {
 
     await userEvent.click(expandIcon);
 
-    expect(onExpandedChange).toHaveBeenCalledWith({ 1: true, 2: true }, 0);
+    expect(onExpandedChange).toHaveBeenCalledWith({ 1: true, 2: true }, '0');
     expect(onExpandedChange).not.toHaveBeenCalledWith({ 0: true, 1: true, 2: true });
   });
 

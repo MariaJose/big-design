@@ -37,7 +37,17 @@ export const useSelectable = (selectable?: TableSelectable) => {
   const isChildrenRowsSelectable = selectable?.isChildrenRowsSelectable ?? false;
   const [selectedItems, setSelectedItems] = useState<TableSelectable['selectedItems']>({});
   const [selectedParentRowsCrossPages, setSelectedParentRowsCrossPages] = useState<Set<string>>(
-    new Set(),
+    () => {
+      const initialSelectedParentRows = selectable?.initialSelectedParentRows ?? [];
+
+      if (initialSelectedParentRows.length) {
+        const initialSelectedParentRowsCrossPages = new Set(initialSelectedParentRows);
+
+        return new Set(initialSelectedParentRowsCrossPages);
+      }
+
+      return new Set();
+    },
   );
 
   const onItemSelectEventCallback: OnItemSelectFn = useEventCallback(

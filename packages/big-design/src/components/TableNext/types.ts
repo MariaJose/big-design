@@ -9,6 +9,7 @@ export interface TableSelectable {
   selectedItems: Record<string, true>;
   onSelectionChange(selectedItems: Record<string, true>): void;
   isChildrenRowsSelectable?: boolean;
+  initialSelectedParentRows?: string[];
 }
 export interface LoadMoreAction {
   isLoading: boolean;

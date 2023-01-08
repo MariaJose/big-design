@@ -23,16 +23,25 @@ const defaultColumns: Array<TableColumn<Item>> = [
   { hash: 'stock', header: 'Stock', render: ({ stock }) => stock },
 ];
 
+const defaultGetRowId = (_row: Item, parentRowIndex: number) => `${parentRowIndex}`;
+
 test('renders a table row', async () => {
   render(
-    <Row
-      columns={defaultColumns}
-      headerCellWidths={[]}
-      isDraggable={false}
-      item={item}
-      parentRowIndex={0}
-      selectedItems={{}}
-    />,
+    <table>
+      <tbody>
+        <Row
+          childrenRowsIds={[]}
+          columns={defaultColumns}
+          getRowId={defaultGetRowId}
+          headerCellWidths={[]}
+          isDraggable={false}
+          item={item}
+          parentRowId="0"
+          parentRowIndex={0}
+          selectedItems={{}}
+        />
+      </tbody>
+    </table>,
   );
 
   const name = await screen.findByRole('row', { name: /Smith Journal 13/i });
@@ -52,6 +61,9 @@ test('row state callbacks execute argument callback', () => {
     onExpandedRow,
     onItemSelect,
     parentRowIndex: 0,
+    isChildrenRowsSelectable: false,
+    childrenRowsIds: [],
+    parentRowId: '0',
   });
 
   onChange();
