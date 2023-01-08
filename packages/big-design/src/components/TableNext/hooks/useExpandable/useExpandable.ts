@@ -7,44 +7,29 @@ export const useExpandable = <T>(expandable?: TableExpandable<T>) => {
   const [expandedRows, setExpandedRows] = useState<TableExpandable<T>['expandedRows']>({});
   const isExpandable = Boolean(expandable);
 
-  const expandedItemsEventCallback = useEventCallback(
-    // TODO: check this
-    (parentRowIndex: number | null, parentRowId: string) => {
-      if (!expandable || parentRowIndex === null) {
-        return;
-      }
+  const expandedItemsEventCallback = useEventCallback((parentRowId: string) => {
+    if (!expandable || parentRowId === null) {
+      return;
+    }
 
-      const { onExpandedChange } = expandable;
+    const { onExpandedChange } = expandable;
 
-      const isExpandedRow =
-        // TODO: check this
-        parentRowId !== undefined && parentRowId !== null
-          ? expandedRows[parentRowId] !== undefined
-          : expandedRows[parentRowIndex] !== undefined;
+    const isExpandedRow = expandedRows[parentRowId] !== undefined;
 
-      if (isExpandedRow) {
-        const newExpandedRows = Object.entries(expandedRows).filter(([key]) => {
-          if (parentRowId !== undefined) {
-            return key !== parentRowId;
-          }
+    if (isExpandedRow) {
+      const newExpandedRows = Object.entries(expandedRows).filter(([key]) => {
+        return key !== `${parentRowId}`;
+      });
 
-          return key !== `${parentRowIndex}`;
-        });
+      onExpandedChange(Object.fromEntries(newExpandedRows), parentRowId);
+    } else {
+      const newExpandedRows = { ...expandedRows };
 
-        // TODO: update this
+      newExpandedRows[parentRowId] = true;
 
-        onExpandedChange(Object.fromEntries(newExpandedRows), parentRowId ?? parentRowIndex);
-      } else {
-        const newExpandedRows = { ...expandedRows };
-
-        // TODO: update this
-        newExpandedRows[parentRowId ?? parentRowIndex] = true;
-
-        // TODO: update this
-        onExpandedChange(newExpandedRows, parentRowId ?? parentRowIndex);
-      }
-    },
-  );
+      onExpandedChange(newExpandedRows, parentRowId);
+    }
+  });
 
   useEffect(() => {
     if (expandable?.expandedRows) {

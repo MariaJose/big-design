@@ -8,7 +8,7 @@ import { TableColumnDisplayProps } from './mixins';
 export interface TableSelectable {
   selectedItems: Record<string, true>;
   onSelectionChange(selectedItems: Record<string, true>): void;
-  areChildrenRowsSelectable?: boolean;
+  isChildrenRowsSelectable?: boolean;
 }
 export interface LoadMoreAction {
   isLoading: boolean;
@@ -16,13 +16,12 @@ export interface LoadMoreAction {
   text: string;
 }
 
-type LoadMoreActionCallback = (parentRowIndex: number) => LoadMoreAction | undefined;
+type LoadMoreActionCallback = (parentRowId: string) => LoadMoreAction | undefined;
 
 export interface TableExpandable<T> {
   expandedRows: Record<string, true>;
   expandedRowSelector: (item: T) => T[] | undefined;
-  // TODO: check this
-  onExpandedChange(expandedItems: Record<string, true>, expandedIndex: number | string): void;
+  onExpandedChange(expandedRows: Record<string, true>, expandedRowId: string): void;
   getLoadMoreAction?: LoadMoreActionCallback;
 }
 
@@ -70,5 +69,5 @@ export interface TableProps<T> extends TableHTMLAttributes<HTMLTableElement> {
   selectable?: TableSelectable;
   sortable?: TableSortable<T>;
   stickyHeader?: boolean;
-  getRowId?: (item: T) => string;
+  getRowId?: (item: T, parentRowIndex: number, childRowIndex?: number) => string;
 }

@@ -5,28 +5,18 @@ import { SelectAllProps } from './SelectAll';
 
 type SelectAllRowsArg<T> = Omit<SelectAllProps<T>, 'onChange'>;
 
-export function getTotalSelectedItems<T>({
-  items,
-  selectedItems,
-  // TODO: check this later
-  getRowId,
-}: // selectedItemsRecord,
-// setSelectedItemsRecord,
-SelectAllRowsArg<T>) {
-  // TODO: check this later
-  if (getRowId) {
-    const totalSelectedItems = items.reduce((acc, item) => {
-      if (selectedItems[getRowId(item)]) {
-        return acc + 1;
-      }
+export function getTotalSelectedItems<T>({ items, selectedItems, getRowId }: SelectAllRowsArg<T>) {
+  const totalSelectedItems = items.reduce((acc, parentRow, parentRowIndex) => {
+    const parentRowId = getRowId(parentRow, parentRowIndex);
 
-      return acc;
-    }, 0);
+    if (selectedItems[parentRowId]) {
+      return acc + 1;
+    }
 
-    return totalSelectedItems;
-  }
+    return acc;
+  }, 0);
 
-  return Object.keys(selectedItems).filter((key) => !key.includes('.')).length;
+  return totalSelectedItems;
 }
 
 export function getChildrenRows<T>(
@@ -49,32 +39,26 @@ export function areAllInPageSelected<T>({
   expandedRowSelector,
   pagination,
   getRowId,
+  isChildrenRowsSelectable,
 }: SelectAllRowsArg<T>) {
-  if (items.length <= 0) {
+  if (items.length === 0) {
     return false;
   }
 
   return items.every((parentRow, parentRowIndex) => {
     const pagedIndex = getPagedIndex(parentRowIndex, pagination);
     const childrenRows: T[] = getChildrenRows(parentRow, expandedRowSelector);
+    const childrenRowsIds: string[] = childrenRows.map((childRow, childRowIndex) => {
+      return getRowId(childRow, pagedIndex, childRowIndex);
+    });
+    const parentRowId = getRowId(parentRow, pagedIndex);
 
     // Not need to check childrens since expandable mode is not used.
-    if (!isExpandable || childrenRows.length === 0) {
-      // TODO: check this
-      if (getRowId !== undefined) {
-        return selectedItems[getRowId(parentRow)] !== undefined;
-      }
-
-      return selectedItems[pagedIndex] !== undefined;
+    if (!isExpandable || childrenRowsIds.length === 0 || !isChildrenRowsSelectable) {
+      return selectedItems[parentRowId];
     }
 
-    return areAllParentsAndChildrenSelected(
-      childrenRows,
-      selectedItems,
-      pagedIndex,
-      parentRow,
-      getRowId,
-    );
+    return areAllParentsAndChildrenSelected(selectedItems, childrenRowsIds, parentRowId);
   });
 }
 
@@ -85,6 +69,7 @@ export function areSomeInPageSelected<T>({
   expandedRowSelector,
   pagination,
   getRowId,
+  isChildrenRowsSelectable,
 }: SelectAllRowsArg<T>): boolean {
   if (items.length <= 0) {
     return false;
@@ -93,71 +78,51 @@ export function areSomeInPageSelected<T>({
   return items.some((parentRow, parentRowIndex) => {
     const pagedIndex = getPagedIndex(parentRowIndex, pagination);
     const childrenRows: T[] = getChildrenRows(parentRow, expandedRowSelector);
+    const childrenRowsIds: string[] = childrenRows.map((childRow, childRowIndex) => {
+      return getRowId(childRow, pagedIndex, childRowIndex);
+    });
+    const parentRowId = getRowId(parentRow, pagedIndex);
 
-    // Not need to check childrens since expandable mode is not used.
-    if (!isExpandable || childrenRows.length === 0) {
-      if (getRowId !== undefined) {
-        return selectedItems[getRowId(parentRow)] !== undefined;
-      }
-
-      return selectedItems[pagedIndex] !== undefined;
+    if (!isExpandable || childrenRowsIds.length === 0 || !isChildrenRowsSelectable) {
+      return selectedItems[parentRowId] !== undefined;
     }
 
-    return areSomeParentsAndChildrenSelected(
-      childrenRows,
-      selectedItems,
-      pagedIndex,
-      parentRow,
-      getRowId,
-    );
+    return areSomeParentsAndChildrenSelected(selectedItems, childrenRowsIds, parentRowId);
   });
 }
 
-function areAllParentsAndChildrenSelected<T>(
-  childrenRows: T[],
+function areAllParentsAndChildrenSelected(
   selectedItems: TableSelectable['selectedItems'],
-  pagedIndex: number,
-  parentRow: T,
-  getRowId?: (item: T) => string,
+  childrenRowsIds: string[],
+  parentRowId: string,
 ) {
-  // TODO: update this
-  const allChildrenRowsSelected = childrenRows.every((childRow, childRowIndex) => {
-    if (getRowId !== undefined) {
-      const childRowId = getRowId(childRow);
-
-      return selectedItems[childRowId] !== undefined;
-    }
-
-    return selectedItems[`${pagedIndex}.${childRowIndex}`] !== undefined;
-  });
-
-  if (getRowId !== undefined) {
-    return selectedItems[getRowId(parentRow)] !== undefined && allChildrenRowsSelected;
+  // Parent with no children
+  if (childrenRowsIds.length === 0) {
+    return selectedItems[parentRowId] !== undefined;
   }
 
-  return selectedItems[pagedIndex] !== undefined && allChildrenRowsSelected;
+  const allChildrenRowsSelected = childrenRowsIds.every((childRowId) => {
+    return selectedItems[childRowId];
+  });
+
+  return selectedItems[parentRowId] !== undefined && allChildrenRowsSelected;
 }
 
-function areSomeParentsAndChildrenSelected<T>(
-  childrenRows: T[],
+function areSomeParentsAndChildrenSelected(
   selectedItems: TableSelectable['selectedItems'],
-  pagedIndex: number,
-  parentRow: T,
-  getRowId?: (item: T) => string,
+  childrenRowsIds: string[],
+  parentRowId: string,
 ) {
-  const someChildrenRowsInPageSelected = childrenRows.some((childRow, childRowIndex) => {
-    if (getRowId !== undefined) {
-      return selectedItems[getRowId(childRow)] !== undefined;
-    }
-
-    return selectedItems[`${pagedIndex}.${childRowIndex}`] !== undefined;
-  });
-
-  if (getRowId !== undefined) {
-    return selectedItems[getRowId(parentRow)] !== undefined && someChildrenRowsInPageSelected;
+  // Parent with no children
+  if (childrenRowsIds.length === 0) {
+    return selectedItems[parentRowId] !== undefined;
   }
 
-  return selectedItems[pagedIndex] !== undefined && someChildrenRowsInPageSelected;
+  const someChildrenRowsInPageSelected = childrenRowsIds.some((childRowId) => {
+    return selectedItems[childRowId] !== undefined;
+  });
+
+  return selectedItems[parentRowId] !== undefined && someChildrenRowsInPageSelected;
 }
 
 function deselectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
@@ -167,43 +132,35 @@ function deselectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
     pagination,
     getRowId,
     expandedRowSelector,
-    setSelectedItemsRecord,
+    setSelectedParentRowsCrossPages,
   } = params;
 
-  if (getRowId !== undefined && pagination !== undefined) {
-    const newSelectedItems = { ...selectedItems };
+  const newSelectedItems = { ...selectedItems };
 
-    items.forEach((item) => {
-      delete newSelectedItems[getRowId(item)];
+  items.forEach((item, index) => {
+    const pagedIndex = getPagedIndex(index, pagination);
+    const parentRowId = getRowId(item, pagedIndex);
 
-      setSelectedItemsRecord((prevSelectedRecords) => {
-        const newSet = new Set([...prevSelectedRecords]);
+    setSelectedParentRowsCrossPages((prevSelectedRecords) => {
+      const newSet = new Set([...prevSelectedRecords]);
 
-        newSet.delete(getRowId(item));
+      newSet.delete(parentRowId);
 
-        return newSet;
-      });
-
-      const childrenRows = getChildrenRows(item, expandedRowSelector);
-
-      childrenRows.forEach((childRow) => {
-        delete newSelectedItems[getRowId(childRow)];
-      });
+      return newSet;
     });
 
-    return newSelectedItems;
-  }
+    delete newSelectedItems[parentRowId];
 
-  const filteredSelectedItems = Object.keys(selectedItems)
-    .filter((selectedKey) => {
-      const [parentIndex] = selectedKey.split('.').map((key) => parseInt(key, 10));
-      const item = items.find((_, index) => getPagedIndex(index, pagination) === parentIndex);
+    const childrenRows = getChildrenRows(item, expandedRowSelector);
 
-      return !item;
-    })
-    .map<[string, true]>((key) => [key, true]);
+    childrenRows.forEach((childRow, childRowIndex) => {
+      const childRowId = getRowId(childRow, pagedIndex, childRowIndex);
 
-  return Object.fromEntries(filteredSelectedItems);
+      delete newSelectedItems[childRowId];
+    });
+  });
+
+  return newSelectedItems;
 }
 
 function selectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
@@ -214,44 +171,34 @@ function selectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
     expandedRowSelector,
     pagination,
     getRowId,
-    setSelectedItemsRecord,
+    setSelectedParentRowsCrossPages,
+    isChildrenRowsSelectable,
   } = params;
   const newSelectedItems = items.map((parentRow, parentRowIndex) => {
     const pagedIndex = getPagedIndex(parentRowIndex, pagination);
     const childrenRows: T[] = getChildrenRows(parentRow, expandedRowSelector);
+    const parentRowId = getRowId(parentRow, pagedIndex);
 
     // Select parents record to check select all
-    if (getRowId !== undefined) {
-      setSelectedItemsRecord((prevSelectedRecords) => {
-        const newSet = new Set([...prevSelectedRecords]);
+    setSelectedParentRowsCrossPages((prevSelectedRecords) => {
+      const newSet = new Set([...prevSelectedRecords]);
 
-        newSet.add(getRowId(parentRow));
+      newSet.add(parentRowId);
 
-        return newSet;
-      });
-    }
+      return newSet;
+    });
 
-    if (isExpandable) {
+    if (isExpandable && isChildrenRowsSelectable) {
       const newSelectedChildrenRows = childrenRows.map<[string, true]>((child, childRowIndex) => {
-        if (getRowId !== undefined) {
-          return [getRowId(child), true];
-        }
+        const childRowId = getRowId(child, pagedIndex, childRowIndex);
 
-        return [`${pagedIndex}.${childRowIndex}`, true];
+        return [`${childRowId}`, true];
       });
 
-      if (getRowId !== undefined) {
-        return [[getRowId(parentRow), true], ...newSelectedChildrenRows];
-      }
-
-      return [[`${pagedIndex}`, true], ...newSelectedChildrenRows];
+      return [[`${parentRowId}`, true], ...newSelectedChildrenRows];
     }
 
-    if (getRowId !== undefined) {
-      return [[`${getRowId(parentRow)}`, true]];
-    }
-
-    return [[`${pagedIndex}`, true]];
+    return [[`${parentRowId}`, true]];
   });
 
   return { ...selectedItems, ...Object.fromEntries(newSelectedItems.flat()) };

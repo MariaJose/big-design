@@ -8,7 +8,7 @@ import { Flex } from '../../Flex';
 import { FlexedProps } from '../../Flex/types';
 import { DataCell } from '../DataCell';
 import { OnItemSelectFn } from '../hooks';
-import { TableColumn, TableItem, TableSelectable } from '../types';
+import { TableColumn, TableItem, TableProps, TableSelectable } from '../types';
 
 import { StyledTableRow } from './styled';
 import { useRowState } from './useRowState';
@@ -38,14 +38,14 @@ export interface RowProps<T> extends TableHTMLAttributes<HTMLTableRowElement> {
   item: T;
   parentRowIndex: number;
   selectedItems: TableSelectable['selectedItems'];
-  showDragIcon?: TableSelectable['areChildrenRowsSelectable'];
-  areChildrenRowsSelectable?: boolean;
-  // TODO: update this
-  onExpandedRow?(parentRowIndex: number | null, parentRowId?: string | undefined): void;
+  showDragIcon?: boolean;
+  isChildrenRowsSelectable?: TableSelectable['isChildrenRowsSelectable'];
+  onExpandedRow?(parentRowId?: string | undefined): void;
   onItemSelect?: OnItemSelectFn;
-  // TODO: Update type
-  getRowId?: (item: T) => string;
-  parentRowId?: string;
+  parentRowId: string;
+  childRowId?: string;
+  getRowId: NonNullable<TableProps<T>['getRowId']>;
+  childrenRowsIds: string[];
 }
 
 const InternalRow = <T extends TableItem>({
@@ -67,15 +67,16 @@ const InternalRow = <T extends TableItem>({
   isExpanded = false,
   selectedItems,
   isParentRow = false,
-  areChildrenRowsSelectable,
+  isChildrenRowsSelectable = false,
   getRowId,
   parentRowId,
+  childRowId,
+  childrenRowsIds,
   ...rest
 }: RowProps<T> & PrivateProps) => {
   const { hasChildrenRows, isChecked, isIndeterminate, label, onChange, onExpandedChange } =
     useRowState({
       childRowIndex,
-      childrenRows,
       isExpandable,
       isParentRow,
       isSelected,
@@ -84,7 +85,9 @@ const InternalRow = <T extends TableItem>({
       selectedItems,
       parentRowIndex,
       parentRowId,
-      getRowId,
+      childRowId,
+      isChildrenRowsSelectable,
+      childrenRowsIds,
     });
 
   const renderSelectDataCell = () => {
@@ -186,7 +189,7 @@ const InternalRow = <T extends TableItem>({
                   isExpandable &&
                   isSelectable &&
                   !isParentRow &&
-                  areChildrenRowsSelectable && (
+                  isChildrenRowsSelectable && (
                     <Checkbox
                       checked={isSelected}
                       hiddenLabel

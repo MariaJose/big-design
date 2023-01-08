@@ -5,7 +5,13 @@ import { FlexItem } from '../../Flex';
 import { Text } from '../../Typography';
 import { SelectAll } from '../SelectAll';
 import { TablePagination } from '../TablePagination';
-import { TableExpandable, TableItem, TablePaginationProps, TableSelectable } from '../types';
+import {
+  TableExpandable,
+  TableItem,
+  TablePaginationProps,
+  TableProps,
+  TableSelectable,
+} from '../types';
 
 import { StyledFlex } from './styled';
 
@@ -21,10 +27,10 @@ export interface ActionsProps<T> {
   tableId: string;
   expandedRowSelector?: TableExpandable<T>['expandedRowSelector'];
   onSelectionChange?: TableSelectable['onSelectionChange'];
-  // TODO: check types
-  getRowId?: (item: T) => string;
-  setSelectedItemsRecord: Dispatch<SetStateAction<Set<string>>>;
-  selectedItemsRecord: Set<string>;
+  getRowId: NonNullable<TableProps<T>['getRowId']>;
+  setSelectedParentRowsCrossPages: Dispatch<SetStateAction<Set<string>>>;
+  selectedParentRowsCrossPages: Set<string>;
+  isChildrenRowsSelectable?: boolean;
 }
 
 const InternalActions = <T extends TableItem>({
@@ -40,8 +46,9 @@ const InternalActions = <T extends TableItem>({
   expandedRowSelector,
   onSelectionChange,
   getRowId,
-  setSelectedItemsRecord,
-  selectedItemsRecord,
+  setSelectedParentRowsCrossPages,
+  selectedParentRowsCrossPages,
+  isChildrenRowsSelectable,
   ...props
 }: ActionsProps<T>) => {
   const isSelectable = typeof onSelectionChange === 'function';
@@ -79,13 +86,14 @@ const InternalActions = <T extends TableItem>({
         <SelectAll
           expandedRowSelector={expandedRowSelector}
           getRowId={getRowId}
+          isChildrenRowsSelectable={isChildrenRowsSelectable}
           isExpandable={isExpandable}
           items={items}
           onChange={onSelectionChange}
           pagination={pagination}
           selectedItems={selectedItems}
-          selectedItemsRecord={selectedItemsRecord}
-          setSelectedItemsRecord={setSelectedItemsRecord}
+          selectedParentRowsCrossPages={selectedParentRowsCrossPages}
+          setSelectedParentRowsCrossPages={setSelectedParentRowsCrossPages}
           totalItems={totalItems}
         />
       )}

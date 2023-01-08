@@ -39,7 +39,13 @@ const InternalTableNext = <T extends TableItem>(
     stickyHeader,
     style,
     onRowDrop,
-    getRowId,
+    getRowId = (_item, parentRowIndex, childRowIndex) => {
+      if (childRowIndex !== undefined) {
+        return `${parentRowIndex}.${childRowIndex}`;
+      }
+
+      return `${parentRowIndex}`;
+    },
     ...rest
   } = props;
 
@@ -52,9 +58,9 @@ const InternalTableNext = <T extends TableItem>(
     isSelectable,
     onItemSelect,
     selectedItems,
-    areChildrenRowsSelectable,
-    setSelectedItemsRecord,
-    selectedItemsRecord,
+    isChildrenRowsSelectable,
+    setSelectedParentRowsCrossPages,
+    selectedParentRowsCrossPages,
   } = useSelectable(selectable);
   const { expandedRows, expandedRowSelector, isExpandable, onExpandedRow, setExpandedRows } =
     useExpandable(expandable);
@@ -183,7 +189,6 @@ const InternalTableNext = <T extends TableItem>(
                     isDragging={snapshot.isDragging}
                     {...provided.dragHandleProps}
                     {...provided.draggableProps}
-                    areChildrenRowsSelectable={areChildrenRowsSelectable}
                     columns={columns}
                     expandedRowSelector={expandedRowSelector}
                     expandedRows={expandedRows}
@@ -191,6 +196,7 @@ const InternalTableNext = <T extends TableItem>(
                     getLoadMoreAction={expandable?.getLoadMoreAction}
                     getRowId={getRowId}
                     headerCellWidths={headerCellWidths}
+                    isChildrenRowsSelectable={isChildrenRowsSelectable}
                     isExpandable={isExpandable}
                     isSelectable={isSelectable}
                     item={item}
@@ -223,7 +229,6 @@ const InternalTableNext = <T extends TableItem>(
 
           return (
             <RowContainer
-              areChildrenRowsSelectable={areChildrenRowsSelectable}
               columns={columns}
               expandedRowSelector={expandedRowSelector}
               expandedRows={expandedRows}
@@ -232,6 +237,7 @@ const InternalTableNext = <T extends TableItem>(
               getRowId={getRowId}
               headerCellWidths={headerCellWidths}
               headerless={headerless}
+              isChildrenRowsSelectable={isChildrenRowsSelectable}
               isExpandable={isExpandable}
               isSelectable={isSelectable}
               item={item}
@@ -262,14 +268,15 @@ const InternalTableNext = <T extends TableItem>(
           expandedRowSelector={expandedRowSelector}
           forwardedRef={actionsRef}
           getRowId={getRowId}
+          isChildrenRowsSelectable={isChildrenRowsSelectable}
           isExpandable={isExpandable}
           itemName={itemName}
           items={items}
           onSelectionChange={selectable && selectable.onSelectionChange}
           pagination={pagination}
           selectedItems={selectedItems}
-          selectedItemsRecord={selectedItemsRecord}
-          setSelectedItemsRecord={setSelectedItemsRecord}
+          selectedParentRowsCrossPages={selectedParentRowsCrossPages}
+          setSelectedParentRowsCrossPages={setSelectedParentRowsCrossPages}
           stickyHeader={stickyHeader}
           tableId={tableIdRef.current}
         />
@@ -301,8 +308,3 @@ export const TableNext = typedMemo(InternalTableNext);
 export const TableFigureNext: React.FC<{ children?: React.ReactNode } & MarginProps> = memo(
   (props) => <StyledTableFigure {...props} />,
 );
-
-// getRowId   (item) => item.id
-
-// getRowId   (item, parentRowIndex, index) => parentRowIndex + . + index
-//

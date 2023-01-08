@@ -1,25 +1,23 @@
 import { OnItemSelectFn } from '../hooks';
 import { TableSelectable } from '../types';
 
-interface UseRowStateProps<T> {
+interface UseRowStateProps {
   childRowIndex?: number;
-  childrenRows?: T[];
   isExpandable: boolean;
   isParentRow: boolean;
   isSelected?: boolean;
+  childRowId?: string;
   selectedItems: TableSelectable['selectedItems'];
-  onExpandedRow?(parentRowIndex: number | null, parentRowId: string | undefined): void;
+  onExpandedRow?(parentRowId: string | undefined): void;
   onItemSelect?: OnItemSelectFn;
   parentRowIndex: number;
-  rowId?: string;
-  // TODO: update this
-  getRowId?: (item: T) => string;
-  parentRowId?: string;
+  parentRowId: string;
+  isChildrenRowsSelectable: boolean;
+  childrenRowsIds: string[];
 }
 
-export const useRowState = <T>({
+export const useRowState = ({
   childRowIndex,
-  childrenRows,
   isExpandable,
   isParentRow,
   isSelected,
@@ -27,57 +25,61 @@ export const useRowState = <T>({
   onExpandedRow,
   onItemSelect,
   parentRowIndex,
-  rowId,
-  getRowId,
   parentRowId,
-}: UseRowStateProps<T>) => {
+  childRowId,
+  isChildrenRowsSelectable,
+  childrenRowsIds,
+}: UseRowStateProps) => {
   const onChange = () => {
     if (onItemSelect) {
       onItemSelect({
         childRowIndex: childRowIndex ?? null,
-        childrenRows: childrenRows ?? [],
         isParentRow,
         isExpandable,
         parentRowIndex,
-        rowId,
-        getRowId,
         parentRowId,
+        childRowId,
+        childrenRowsIds,
       });
     }
   };
 
   const onExpandedChange = () => {
     if (onExpandedRow) {
-      onExpandedRow(parentRowIndex ?? null, parentRowId);
+      onExpandedRow(parentRowId);
     }
   };
 
-  const hasChildrenRows = Array.isArray(childrenRows);
+  const hasChildrenRows = Boolean(childrenRowsIds?.length !== 0);
 
   const allChildrenRowsSelected =
     isExpandable &&
-    childrenRows?.every((childRow, childRowIndex) => {
-      if (rowId !== undefined && getRowId) {
-        return selectedItems[getRowId(childRow)] !== undefined;
-        // eslint-disable-next-line no-else-return
-      } else {
-        return selectedItems[`${parentRowIndex}.${childRowIndex}`] !== undefined;
-      }
+    hasChildrenRows &&
+    childrenRowsIds.every((childRowId) => {
+      return selectedItems[childRowId] !== undefined;
     });
 
   const someChildrenRowsSelected =
     isExpandable &&
-    childrenRows?.some((childRow, childRowIndex) => {
-      if (rowId !== undefined && getRowId) {
-        return selectedItems[getRowId(childRow)] !== undefined;
-      }
-
-      return selectedItems[`${parentRowIndex}.${childRowIndex}`] !== undefined;
+    hasChildrenRows &&
+    childrenRowsIds.some((childRowId) => {
+      return selectedItems[childRowId] !== undefined;
     });
 
-  const isChecked = isExpandable && hasChildrenRows ? allChildrenRowsSelected : isSelected;
+  const isChecked = isParentRow
+    ? isChildrenRowsSelectable && hasChildrenRows
+      ? allChildrenRowsSelected
+      : isSelected
+    : isSelected;
 
-  const isIndeterminate = isExpandable && hasChildrenRows ? someChildrenRowsSelected : undefined;
+  const isIndeterminate = isParentRow
+    ? isChildrenRowsSelectable && hasChildrenRows
+      ? someChildrenRowsSelected
+      : false
+    : false;
+
+  const isParentChecked = isSelected;
+  const isChildCheck = allChildrenRowsSelected;
 
   const label = isSelected ? `Selected` : `Unselected`;
 
@@ -88,5 +90,7 @@ export const useRowState = <T>({
     label,
     onChange,
     onExpandedChange,
+    isChildCheck,
+    isParentChecked,
   };
 };

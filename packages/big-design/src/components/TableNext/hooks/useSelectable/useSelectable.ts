@@ -10,42 +10,45 @@ import {
   SelectRowArg,
 } from './helpers';
 
-interface OnItemSelectFnArg<T>
-  extends Omit<SelectRowArg<T>, 'childRowIndex' | 'selectedItems' | 'setSelectedItemsRecord'> {
+interface OnItemSelectFnArg
+  extends Omit<
+    SelectRowArg,
+    'childRowIndex' | 'selectedItems' | 'setSelectedParentRowsCrossPages'
+  > {
   childRowIndex: number | null;
   isParentRow: boolean;
-  rowId?: string;
-  getRowId?: (item: T) => string;
-  parentRowId?: string;
-  // setSelectedItemsRecord: Dispatch<SetStateAction<Set<string> | undefined>>;
+  parentRowId: string;
+  childRowId?: string;
+  childrenRowsIds: string[];
 }
 
-export type OnItemSelectFn = <T>({
+export type OnItemSelectFn = ({
   childRowIndex,
-  childrenRows,
   isParentRow,
   isExpandable,
   parentRowIndex,
-  // rowId,
-  getRowId,
   parentRowId,
-}: OnItemSelectFnArg<T>) => void;
+  childRowId,
+  childrenRowsIds,
+}: OnItemSelectFnArg) => void;
 
 export const useSelectable = (selectable?: TableSelectable) => {
   const isSelectable = Boolean(selectable);
+  const isChildrenRowsSelectable = selectable?.isChildrenRowsSelectable ?? false;
   const [selectedItems, setSelectedItems] = useState<TableSelectable['selectedItems']>({});
-  // TODO: check types
-  const [selectedItemsRecord, setSelectedItemsRecord] = useState<Set<string>>(new Set());
+  const [selectedParentRowsCrossPages, setSelectedParentRowsCrossPages] = useState<Set<string>>(
+    new Set(),
+  );
 
   const onItemSelectEventCallback: OnItemSelectFn = useEventCallback(
     ({
       childRowIndex,
-      childrenRows,
       isParentRow,
       isExpandable,
       parentRowIndex,
-      getRowId,
       parentRowId,
+      childRowId,
+      childrenRowsIds,
     }) => {
       if (!selectable) {
         return;
@@ -55,24 +58,25 @@ export const useSelectable = (selectable?: TableSelectable) => {
 
       if (isParentRow) {
         const newSelectedItems = selectParentRow({
-          childrenRows,
           isExpandable,
           parentRowIndex,
           selectedItems,
-          getRowId,
+          setSelectedParentRowsCrossPages,
           parentRowId,
-          setSelectedItemsRecord,
+          childRowId,
+          isChildrenRowsSelectable,
+          childrenRowsIds,
         });
 
         onSelectionChange(newSelectedItems);
-      } else if (childRowIndex !== null || parentRowId !== undefined || getRowId !== undefined) {
+      } else if (childRowIndex !== null) {
         const totalSelectedChildRows = getTotalSelectedChildRows({
-          childrenRows,
           parentRowIndex,
           selectedItems,
-          getRowId,
           parentRowId,
-          setSelectedItemsRecord,
+          setSelectedParentRowsCrossPages,
+          childRowId,
+          childrenRowsIds,
         });
 
         const isTheOnlySelectedChildRow = totalSelectedChildRows === 1;
@@ -81,11 +85,12 @@ export const useSelectable = (selectable?: TableSelectable) => {
           isTheOnlySelectedChildRow,
           parentRowIndex,
           selectedItems,
-          childrenRows,
-          getRowId,
           childRowIndex,
           parentRowId,
-          setSelectedItemsRecord,
+          setSelectedParentRowsCrossPages,
+          childRowId,
+          isChildrenRowsSelectable,
+          childrenRowsIds,
         });
 
         onSelectionChange(newSelectedItems);
@@ -103,8 +108,8 @@ export const useSelectable = (selectable?: TableSelectable) => {
     isSelectable,
     onItemSelect: isSelectable ? onItemSelectEventCallback : undefined,
     selectedItems,
-    areChildrenRowsSelectable: selectable?.areChildrenRowsSelectable,
-    selectedItemsRecord,
-    setSelectedItemsRecord,
+    isChildrenRowsSelectable,
+    selectedParentRowsCrossPages,
+    setSelectedParentRowsCrossPages,
   };
 };
