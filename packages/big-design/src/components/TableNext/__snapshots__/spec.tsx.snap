@@ -1067,7 +1067,7 @@ exports[`selectable renders selectable actions and checkboxes 1`] = `
 </div>
 `;
 
-exports[`selectable renders selectable actions, checkboxes when having parent rows and children rows and areChildrenRowsSelectable is true 1`] = `
+exports[`selectable selectable by default (isChildrenRowsSelectable prop is not used or is set to false) when isChildrenRowsSelectable prop is not used or is set to false, as default renders checkboxes just for parent rows 1`] = `
 .c10 {
   vertical-align: middle;
   height: 1.5rem;
@@ -1361,7 +1361,7 @@ exports[`selectable renders selectable actions, checkboxes when having parent ro
 </div>
 `;
 
-exports[`selectable renders selectable actions, checkboxes when having parent rows and children rows and isChildrenRowsSelectable is false 1`] = `
+exports[`selectable selectable by not default (isChildrenRowsSelectable prop is used and it is set to true renders checkboxes for parent rows and children rows) 1`] = `
 .c10 {
   vertical-align: middle;
   height: 1.5rem;
@@ -1580,7 +1580,7 @@ exports[`selectable renders selectable actions, checkboxes when having parent ro
 }
 
 <div
-  aria-controls=":r91:"
+  aria-controls=":rba:"
   class="c0"
 >
   <div
@@ -1594,15 +1594,15 @@ exports[`selectable renders selectable actions, checkboxes when having parent ro
       >
         <input
           aria-checked="false"
-          aria-labelledby=":r93:"
+          aria-labelledby=":rbc:"
           class="c6 c7"
-          id=":r92:"
+          id=":rbb:"
           type="checkbox"
         />
         <label
           aria-hidden="true"
           class="c8 c9"
-          for=":r92:"
+          for=":rbb:"
         >
           <svg
             aria-hidden="true"
@@ -1628,9 +1628,9 @@ exports[`selectable renders selectable actions, checkboxes when having parent ro
         >
           <label
             class="c12 c13"
-            for=":r92:"
+            for=":rbb:"
             hidden=""
-            id=":r93:"
+            id=":rbc:"
           >
             Select All
           </label>
