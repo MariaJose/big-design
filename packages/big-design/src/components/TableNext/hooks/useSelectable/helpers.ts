@@ -3,10 +3,8 @@ import { Dispatch, SetStateAction } from 'react';
 import { TableSelectable } from '../../types';
 
 export interface SelectRowArg {
-  childRowIndex?: number | null;
   isExpandable?: boolean;
   isTheOnlySelectedChildRow?: boolean;
-  parentRowIndex: number;
   selectedItems: TableSelectable['selectedItems'];
   isParentRow?: boolean;
   parentRowId: string;
@@ -18,7 +16,6 @@ export interface SelectRowArg {
 
 export function selectParentRow({
   isExpandable,
-  parentRowIndex,
   selectedItems,
   setSelectedParentRowsCrossPages,
   childRowId,
@@ -26,13 +23,11 @@ export function selectParentRow({
   isChildrenRowsSelectable,
   childrenRowsIds,
 }: SelectRowArg): TableSelectable['selectedItems'] {
-  const parentRow = parentRowId !== undefined ? parentRowId : parentRowIndex;
-  const isSelectedParent = selectedItems[parentRow] !== undefined;
+  const isSelectedParent = selectedItems[parentRowId] !== undefined;
 
   if (isSelectedParent) {
     const newSelectedItems = unselectParent({
       isExpandable,
-      parentRowIndex,
       selectedItems,
       setSelectedParentRowsCrossPages,
       childRowId,
@@ -46,7 +41,6 @@ export function selectParentRow({
 
   const newSelectedItems = selectParent({
     isExpandable,
-    parentRowIndex,
     selectedItems,
     parentRowId,
     setSelectedParentRowsCrossPages,
@@ -60,7 +54,6 @@ export function selectParentRow({
 
 function unselectParent({
   isExpandable,
-  parentRowIndex,
   selectedItems,
   parentRowId,
   setSelectedParentRowsCrossPages,
@@ -74,7 +67,6 @@ function unselectParent({
   if (hasChildrenRows && isChildrenRowsSelectable) {
     const newSelectedItems = unselectParentAndChildren({
       selectedItems,
-      parentRowIndex,
       parentRowId,
       setSelectedParentRowsCrossPages,
       childRowId,
@@ -127,7 +119,6 @@ function unselectParentAndChildren({
 
 function selectParent({
   isExpandable,
-  parentRowIndex,
   selectedItems,
   parentRowId,
   setSelectedParentRowsCrossPages,
@@ -141,7 +132,6 @@ function selectParent({
   if (hasChildrenRows && isChildrenRowsSelectable) {
     const newSelectedItems = selectParentAndChildren({
       selectedItems,
-      parentRowIndex,
       parentRowId,
       childRowId,
       setSelectedParentRowsCrossPages,
@@ -192,10 +182,8 @@ function selectParentAndChildren({
 
 export function selectChildRow({
   childRowId,
-  childRowIndex,
   isTheOnlySelectedChildRow,
   selectedItems,
-  parentRowIndex,
   parentRowId,
   setSelectedParentRowsCrossPages,
   childrenRowsIds,
@@ -204,8 +192,6 @@ export function selectChildRow({
 
   if (!isSelectedParent) {
     const newSelectedItems = selectChild({
-      childRowIndex,
-      parentRowIndex,
       selectedItems,
       parentRowId,
       childRowId,
@@ -221,8 +207,6 @@ export function selectChildRow({
   if (isSelectedChild) {
     const newSelectedItems = unselectChild({
       selectedItems,
-      parentRowIndex,
-      childRowIndex,
       isTheOnlySelectedChildRow,
       setSelectedParentRowsCrossPages,
       parentRowId,

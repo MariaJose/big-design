@@ -11,11 +11,7 @@ import {
 } from './helpers';
 
 interface OnItemSelectFnArg
-  extends Omit<
-    SelectRowArg,
-    'childRowIndex' | 'selectedItems' | 'setSelectedParentRowsCrossPages'
-  > {
-  childRowIndex: number | null;
+  extends Omit<SelectRowArg, 'selectedItems' | 'setSelectedParentRowsCrossPages'> {
   isParentRow: boolean;
   parentRowId: string;
   childRowId?: string;
@@ -23,10 +19,8 @@ interface OnItemSelectFnArg
 }
 
 export type OnItemSelectFn = ({
-  childRowIndex,
   isParentRow,
   isExpandable,
-  parentRowIndex,
   parentRowId,
   childRowId,
   childrenRowsIds,
@@ -51,15 +45,7 @@ export const useSelectable = (selectable?: TableSelectable) => {
   );
 
   const onItemSelectEventCallback: OnItemSelectFn = useEventCallback(
-    ({
-      childRowIndex,
-      isParentRow,
-      isExpandable,
-      parentRowIndex,
-      parentRowId,
-      childRowId,
-      childrenRowsIds,
-    }) => {
+    ({ isParentRow, isExpandable, parentRowId, childRowId, childrenRowsIds }) => {
       if (!selectable) {
         return;
       }
@@ -69,7 +55,6 @@ export const useSelectable = (selectable?: TableSelectable) => {
       if (isParentRow) {
         const newSelectedItems = selectParentRow({
           isExpandable,
-          parentRowIndex,
           selectedItems,
           setSelectedParentRowsCrossPages,
           parentRowId,
@@ -79,9 +64,8 @@ export const useSelectable = (selectable?: TableSelectable) => {
         });
 
         onSelectionChange(newSelectedItems);
-      } else if (childRowIndex !== null) {
+      } else {
         const totalSelectedChildRows = getTotalSelectedChildRows({
-          parentRowIndex,
           selectedItems,
           parentRowId,
           setSelectedParentRowsCrossPages,
@@ -93,9 +77,7 @@ export const useSelectable = (selectable?: TableSelectable) => {
 
         const newSelectedItems = selectChildRow({
           isTheOnlySelectedChildRow,
-          parentRowIndex,
           selectedItems,
-          childRowIndex,
           parentRowId,
           setSelectedParentRowsCrossPages,
           childRowId,
