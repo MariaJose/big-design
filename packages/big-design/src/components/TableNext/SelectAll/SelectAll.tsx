@@ -15,7 +15,6 @@ import { useSelectAllState } from './useSelectAllState';
 
 export interface SelectAllProps<T> {
   expandedRowSelector?: TableExpandable<T>['expandedRowSelector'];
-  isExpandable: boolean;
   items: T[];
   onChange?: TableSelectable['onSelectionChange'];
   selectedItems: TableSelectable['selectedItems'];

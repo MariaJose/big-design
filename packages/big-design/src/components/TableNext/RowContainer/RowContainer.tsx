@@ -91,7 +91,7 @@ const InternalRowContainer = <T extends TableItem>({
   return (
     <>
       <Row
-        childrenRowsIds={childrenRowsIds ?? []}
+        childrenRowsIds={childrenRowsIds}
         columns={columns}
         headerCellWidths={headerCellWidths}
         isChildrenRowsSelectable={isChildrenRowsSelectable}
@@ -132,7 +132,7 @@ const InternalRowContainer = <T extends TableItem>({
           return (
             <Row
               childRowId={childRowId}
-              childrenRowsIds={childrenRowsIds ?? []}
+              childrenRowsIds={childrenRowsIds}
               columns={columns}
               headerCellWidths={headerCellWidths}
               isChildrenRowsSelectable={isChildrenRowsSelectable}

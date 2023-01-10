@@ -1,7 +1,6 @@
 import { TableSelectable } from '../types';
 
 interface UseRowStateProps {
-  isExpandable: boolean;
   isParentRow: boolean;
   isSelected?: boolean;
   selectedItems: TableSelectable['selectedItems'];
@@ -11,7 +10,6 @@ interface UseRowStateProps {
 }
 
 export const useRowState = ({
-  isExpandable,
   isParentRow,
   isSelected,
   selectedItems,
@@ -21,14 +19,14 @@ export const useRowState = ({
   const hasChildrenRows = Boolean(childrenRowsIds?.length !== 0);
 
   const allChildrenRowsSelected =
-    isExpandable &&
+    isChildrenRowsSelectable &&
     hasChildrenRows &&
     childrenRowsIds.every((childRowId) => {
       return selectedItems[childRowId] !== undefined;
     });
 
   const someChildrenRowsSelected =
-    isExpandable &&
+    isChildrenRowsSelectable &&
     hasChildrenRows &&
     childrenRowsIds.some((childRowId) => {
       return selectedItems[childRowId] !== undefined;

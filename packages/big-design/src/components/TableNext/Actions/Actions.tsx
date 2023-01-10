@@ -20,7 +20,6 @@ export interface ActionsProps<T> {
   forwardedRef: RefObject<HTMLDivElement>;
   itemName?: string;
   items: T[];
-  isExpandable: boolean;
   pagination?: TablePaginationProps;
   selectedItems: TableSelectable['selectedItems'];
   stickyHeader?: boolean;
@@ -42,7 +41,6 @@ const InternalActions = <T extends TableItem>({
   selectedItems,
   stickyHeader,
   tableId,
-  isExpandable,
   expandedRowSelector,
   onSelectionChange,
   getRowId,
@@ -87,7 +85,6 @@ const InternalActions = <T extends TableItem>({
           expandedRowSelector={expandedRowSelector}
           getRowId={getRowId}
           isChildrenRowsSelectable={isChildrenRowsSelectable}
-          isExpandable={isExpandable}
           items={items}
           onChange={onSelectionChange}
           pagination={pagination}

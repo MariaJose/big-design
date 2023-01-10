@@ -19,7 +19,6 @@ export function getChildrenRows<T>(
 }
 
 export function areAllInPageSelected<T>({
-  isExpandable,
   items,
   selectedItems,
   expandedRowSelector,
@@ -40,7 +39,7 @@ export function areAllInPageSelected<T>({
     const parentRowId = getRowId(parentRow, pagedIndex);
 
     // Not need to check childrens since expandable mode is not used.
-    if (!isExpandable || childrenRowsIds.length === 0 || !isChildrenRowsSelectable) {
+    if (childrenRowsIds.length === 0 || !isChildrenRowsSelectable) {
       return selectedItems[parentRowId];
     }
 
@@ -49,7 +48,6 @@ export function areAllInPageSelected<T>({
 }
 
 export function areSomeInPageSelected<T>({
-  isExpandable,
   items,
   selectedItems,
   expandedRowSelector,
@@ -69,7 +67,7 @@ export function areSomeInPageSelected<T>({
     });
     const parentRowId = getRowId(parentRow, pagedIndex);
 
-    if (!isExpandable || childrenRowsIds.length === 0 || !isChildrenRowsSelectable) {
+    if (childrenRowsIds.length === 0 || !isChildrenRowsSelectable) {
       return selectedItems[parentRowId] !== undefined;
     }
 
@@ -151,7 +149,6 @@ function deselectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
 
 function selectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
   const {
-    isExpandable,
     items,
     selectedItems,
     expandedRowSelector,
@@ -174,7 +171,7 @@ function selectAllOnCurrentPage<T>(params: SelectAllRowsArg<T>) {
       return newSet;
     });
 
-    if (isExpandable && isChildrenRowsSelectable) {
+    if (isChildrenRowsSelectable) {
       const newSelectedChildrenRows = childrenRows.map<[string, true]>((child, childRowIndex) => {
         const childRowId = getRowId(child, pagedIndex, childRowIndex);
 

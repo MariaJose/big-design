@@ -68,7 +68,6 @@ const InternalRow = <T extends TableItem>({
   ...rest
 }: RowProps<T> & PrivateProps) => {
   const { hasChildrenRows, isChecked, isIndeterminate, label } = useRowState({
-    isExpandable,
     isParentRow,
     isSelected,
     selectedItems,
