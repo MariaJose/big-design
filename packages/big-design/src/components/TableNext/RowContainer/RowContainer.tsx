@@ -64,10 +64,12 @@ const InternalRowContainer = <T extends TableItem>({
   const childrenRows: T[] | undefined = expandedRowSelector ? expandedRowSelector?.(item) : [];
   const isDraggable: boolean = showDragIcon === true;
   const loadMoreAction = getLoadMoreAction?.(parentRowId);
+
   const childrenRowsIds =
     childrenRows?.map((childRow, childRowIndex) => {
       return getRowId(childRow, parentRowIndex, childRowIndex);
     }) ?? [];
+
   const onParentRowSelect = () => {
     if (onItemSelect) {
       onItemSelect({
@@ -79,6 +81,7 @@ const InternalRowContainer = <T extends TableItem>({
       });
     }
   };
+
   const onExpandedRowChange = () => {
     if (onExpandedRow) {
       onExpandedRow(parentRowId);
