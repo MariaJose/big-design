@@ -50,6 +50,22 @@ export const useRowState = ({
     }
   };
 
+  const isRowChecked = () => {
+    if (isParentRow) {
+      return isChildrenRowsSelectable && hasChildrenRows ? allChildrenRowsSelected : isSelected;
+    }
+
+    return isSelected;
+  };
+
+  const isRowIndeterminate = () => {
+    if (isParentRow) {
+      return isChildrenRowsSelectable && hasChildrenRows ? someChildrenRowsSelected : false;
+    }
+
+    return false;
+  };
+
   const hasChildrenRows = Boolean(childrenRowsIds?.length !== 0);
 
   const allChildrenRowsSelected =
@@ -66,20 +82,9 @@ export const useRowState = ({
       return selectedItems[childRowId] !== undefined;
     });
 
-  const isChecked = isParentRow
-    ? isChildrenRowsSelectable && hasChildrenRows
-      ? allChildrenRowsSelected
-      : isSelected
-    : isSelected;
+  const isChecked = isRowChecked();
 
-  const isIndeterminate = isParentRow
-    ? isChildrenRowsSelectable && hasChildrenRows
-      ? someChildrenRowsSelected
-      : false
-    : false;
-
-  const isParentChecked = isSelected;
-  const isChildCheck = allChildrenRowsSelected;
+  const isIndeterminate = isRowIndeterminate();
 
   const label = isSelected ? `Selected` : `Unselected`;
 
@@ -90,7 +95,5 @@ export const useRowState = ({
     label,
     onChange,
     onExpandedChange,
-    isChildCheck,
-    isParentChecked,
   };
 };

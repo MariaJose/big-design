@@ -293,7 +293,6 @@ function unselectChild({
 }
 
 export function getTotalSelectedChildRows({ selectedItems, childrenRowsIds }: SelectRowArg) {
-  // TODO: check this
   return childrenRowsIds?.reduce((acc, childRowId) => {
     if (selectedItems[childRowId] !== undefined) {
       return acc + 1;

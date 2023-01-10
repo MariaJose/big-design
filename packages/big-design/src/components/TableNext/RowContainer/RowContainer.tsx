@@ -11,13 +11,7 @@ import { calculateColSpan } from './helpers';
 interface InternalRowContainerProps<T>
   extends Omit<
     RowProps<T>,
-    | 'isSelected'
-    | 'isParentRows'
-    | 'childrenRows'
-    | 'isDraggable'
-    | 'parentRowId'
-    | 'childRowId'
-    | 'childrenRowsIds'
+    'isSelected' | 'isParentRows' | 'isDraggable' | 'parentRowId' | 'childRowId' | 'childrenRowsIds'
   > {
   expandedRows: TableExpandable<T>['expandedRows'];
   expandedRowSelector?: TableExpandable<T>['expandedRowSelector'];
@@ -66,7 +60,6 @@ const InternalRowContainer = <T extends TableItem>({
   return (
     <>
       <Row
-        childrenRows={childrenRows}
         childrenRowsIds={childrenRowsIds ?? []}
         columns={columns}
         getRowId={getRowId}

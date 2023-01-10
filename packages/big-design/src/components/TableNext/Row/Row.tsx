@@ -24,7 +24,6 @@ const ALIGN_MAP: Record<string, FlexedProps['justifyContent']> = {
 };
 
 export interface RowProps<T> extends TableHTMLAttributes<HTMLTableRowElement> {
-  childrenRows?: T[];
   childRowIndex?: number;
   columns: Array<TableColumn<T>>;
   headerCellWidths: Array<number | string>;
@@ -49,7 +48,6 @@ export interface RowProps<T> extends TableHTMLAttributes<HTMLTableRowElement> {
 }
 
 const InternalRow = <T extends TableItem>({
-  childrenRows,
   childRowIndex,
   columns,
   forwardedRef,
@@ -185,19 +183,15 @@ const InternalRow = <T extends TableItem>({
                 flexDirection="row"
                 justifyContent={align && ALIGN_MAP[align]}
               >
-                {columnIndex === 0 &&
-                  isExpandable &&
-                  isSelectable &&
-                  !isParentRow &&
-                  isChildrenRowsSelectable && (
-                    <Checkbox
-                      checked={isSelected}
-                      hiddenLabel
-                      label={label}
-                      onChange={onChange}
-                      width={0}
-                    />
-                  )}
+                {columnIndex === 0 && isSelectable && !isParentRow && isChildrenRowsSelectable && (
+                  <Checkbox
+                    checked={isSelected}
+                    hiddenLabel
+                    label={label}
+                    onChange={onChange}
+                    width={0}
+                  />
+                )}
                 {/*
           // @ts-expect-error https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20544 */}
                 <CellContent {...item} />
